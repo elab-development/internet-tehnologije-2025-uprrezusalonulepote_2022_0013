@@ -2,21 +2,33 @@
   "name": "beauty-salon-webapp",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "db:migrate": "npx drizzle-kit generate && npx drizzle-kit push",
+    "db:seed": "tsx src/app/db/seed.ts"
   },
   "dependencies": {
+    "@prisma/client": "^7.3.0",
+    "@remixicon/react": "^4.9.0",
+    "bcrypt": "^6.0.0",
+    "drizzle-kit": "^0.31.8",
+    "drizzle-orm": "^0.45.1",
+    "jsonwebtoken": "^9.0.3",
     "next": "16.1.6",
+    "pg": "^8.18.0",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "tsx": "^4.21.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
+    "@types/node": "^20.19.31",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "prisma": "^7.3.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
