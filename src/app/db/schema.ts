@@ -28,6 +28,7 @@ export const zaposleni = pgTable(
     prezime: varchar("prezime", { length: 60 }).notNull(),
     email: varchar("email", { length: 120 }).notNull(),
     lozinka: varchar("lozinka", { length: 255 }).notNull(),
+    role: varchar("role", { length: 30 }).notNull().default("ZAPOSLENI"),
     radnoMestoId: integer("radno_mesto_id")
       .notNull()
       .references(() => radnaMesta.idRadnogMesta, { onDelete: "restrict" }),
@@ -53,6 +54,7 @@ export const klijenti = pgTable(
     brTelefona: varchar("br_telefona", { length: 30 }).notNull(),
     adresa: varchar("adresa", { length: 255 }),
     korisnickoIme: varchar("korisnicko_ime", { length: 60 }).notNull(),
+    role: varchar("role", { length: 30 }).notNull().default("KLIJENT"),
   },
   (t) => ({
     klijentiEmailUq: uniqueIndex("klijenti_email_uq").on(t.email),
