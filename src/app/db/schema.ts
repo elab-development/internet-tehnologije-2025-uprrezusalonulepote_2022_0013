@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import {
   pgTable,
   serial,
@@ -9,6 +10,7 @@ import {
   time,
   uniqueIndex,
   primaryKey,
+  check,
 } from "drizzle-orm/pg-core";
 
 // 1) Radno mesto
@@ -32,6 +34,10 @@ export const zaposleni = pgTable(
   },
   (t) => ({
     zaposleniEmailUq: uniqueIndex("zaposleni_email_uq").on(t.email),
+    passwordLengthCheck: check(
+      "zaposleni_lozinka_min_8",
+      sql`length(${t.lozinka}) >= 8`,
+    ),
   }),
 );
 
@@ -52,6 +58,10 @@ export const klijenti = pgTable(
     klijentiEmailUq: uniqueIndex("klijenti_email_uq").on(t.email),
     klijentiUsernameUq: uniqueIndex("klijenti_korisnickoime_uq").on(
       t.korisnickoIme,
+    ),
+    passwordLengthCheck: check(
+      "zaposleni_lozinka_min_8",
+      sql`length(${t.lozinka}) >= 8`,
     ),
   }),
 );
