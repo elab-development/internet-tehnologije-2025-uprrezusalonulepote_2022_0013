@@ -21,6 +21,23 @@ export const mockShifts: ShiftDto[] = [
   { id: "sh2", employeeId: "e2", date: "2026-02-10", startTime: "12:00", endTime: "20:00" },
 ];
 
-export const mockBookings: BookingDto[] = [
-  { id: "b1", clientId: "u1", employeeId: "e1", serviceId: "s1", date: "2026-02-10", startTime: "11:00", endTime: "11:45", status: "ZAKAZAN", createdAt: new Date().toISOString() },
+export const mockBookings = [
+  {
+    id: "b1",
+    date: "2026-02-10",
+    startTime: "10:00",
+    endTime: "11:00",
+    status: "ZAKAZANO",
+    serviceName: "Šišanje",
+    employeeName: "Ana",
+  },
+  {
+    id: "b2",
+    date: "2026-02-11",
+    startTime: "12:00",
+    endTime: "13:00",
+    status: "OTKAZANO",
+    serviceName: "Feniranje",
+    employeeName: "Marija",
+  },
 ];

@@ -39,14 +39,12 @@ export interface ShiftDto {
 
 export type BookingStatus = "ZAKAZAN" | "U_TOKU" | "ZAVRSEN" | "OTKAZAN";
 
-export interface BookingDto {
+export type BookingDto = {
   id: string;
-  clientId: string;
-  employeeId: string;
-  serviceId: string;
-  date: string;      // YYYY-MM-DD
-  startTime: string; // HH:mm
-  endTime: string;   // HH:mm
-  status: BookingStatus;
-  createdAt: string;
-}
+  date: string;
+  startTime: string;
+  endTime: string;
+  status: string;
+  serviceName: string;
+  employeeName: string;
+};

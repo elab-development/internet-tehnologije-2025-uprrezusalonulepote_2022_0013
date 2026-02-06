@@ -5,13 +5,19 @@ export default async function AppointmentsPage() {
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Zakazani termini</h1>
-      <ul className="space-y-3">
-        {bookings.map(b => (
-          <li key={b.id} className="border p-4 rounded">
-            <div>Datum: {b.date}</div>
-            <div>Vreme: {b.startTime} – {b.endTime}</div>
-            <div>Status: {b.status}</div>
+      <h1 className="text-2xl font-bold mb-6">Moji termini</h1>
+
+      <ul className="space-y-4">
+        {bookings.map((b) => (
+          <li key={b.id} className="border rounded-lg p-4">
+            <div className="font-semibold">{b.serviceName}</div>
+            <div className="text-sm text-gray-600">
+              {b.date} · {b.startTime}–{b.endTime}
+            </div>
+            <div className="text-sm">Zaposleni: {b.employeeName}</div>
+            <div className="text-sm mt-1">
+              Status: <b>{b.status}</b>
+            </div>
           </li>
         ))}
       </ul>
