@@ -4,9 +4,39 @@ import { mockBookings } from "@/mock/data";
 // kasnije: USE_MOCK = false
 const USE_MOCK = true;
 
+// localStorage key
+const LS_KEY = "iteh_bookings_v1";
+
+function hasWindow() {
+  return typeof window !== "undefined";
+}
+
+function readFromStorage(): BookingDto[] {
+  if (!hasWindow()) return mockBookings;
+
+  const raw = window.localStorage.getItem(LS_KEY);
+  if (!raw) {
+    window.localStorage.setItem(LS_KEY, JSON.stringify(mockBookings));
+    return [...mockBookings];
+  }
+
+  try {
+    const parsed = JSON.parse(raw) as BookingDto[];
+    return Array.isArray(parsed) ? parsed : [...mockBookings];
+  } catch {
+    window.localStorage.setItem(LS_KEY, JSON.stringify(mockBookings));
+    return [...mockBookings];
+  }
+}
+
+function writeToStorage(items: BookingDto[]) {
+  if (!hasWindow()) return;
+  window.localStorage.setItem(LS_KEY, JSON.stringify(items));
+}
+
 export async function getAppointments(): Promise<BookingDto[]> {
   if (USE_MOCK) {
-    return Promise.resolve(mockBookings);
+    return Promise.resolve(readFromStorage());
   }
   return [];
 }
@@ -16,14 +46,14 @@ export async function updateAppointmentStatus(
   status: BookingStatus
 ): Promise<void> {
   if (USE_MOCK) {
-    const idx = mockBookings.findIndex((b) => b.id === id);
+    const items = readFromStorage();
+    const idx = items.findIndex((b) => b.id === id);
     if (idx === -1) throw new Error("Rezervacija nije pronađena");
 
-    mockBookings[idx] = {
-      ...mockBookings[idx],
-      status,
-    };
+    const next = [...items];
+    next[idx] = { ...next[idx], status };
 
+    writeToStorage(next);
     return Promise.resolve();
   }
 
