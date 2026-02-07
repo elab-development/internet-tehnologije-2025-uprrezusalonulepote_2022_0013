@@ -1,4 +1,3 @@
-// src/shared/types.ts
 export type UserRole = "CLIENT" | "EMPLOYEE" | "ADMIN";
 
 export interface UserDto {
