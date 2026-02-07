@@ -7,62 +7,70 @@ import { getAllUsers } from "@/lib/admin.client";
 import { UserDto } from "@/shared/types";
 
 export default function AdminPage() {
-  const [me, setMe] = useState<UserDto | null>(null);
-  const [users, setUsers] = useState<UserDto[]>([]);
-  const [loading, setLoading] = useState(true);
+const [me, setMe] = useState<UserDto | null>(null);
+const [users, setUsers] = useState<UserDto[]>([]);
+const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function run() {
-      const current = await authMe();
-      setMe(current);
+useEffect(() => {
+  async function run() {
+    const current = await authMe();
+    setMe(current);
 
-      if (current?.role === "ADMIN") {
-        const all = await getAllUsers();
-        setUsers(all);
-      }
-
-      setLoading(false);
+    if (current?.role === "ADMIN") {
+      const all = await getAllUsers();
+      setUsers(all);
     }
 
-    run();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="p-6 max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold mb-2">Admin</h1>
-        <p>Učitavanje...</p>
-      </div>
-    );
+    setLoading(false);
   }
 
-  if (!me || me.role !== "ADMIN") {
-    return (
-      <div className="p-6 max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold mb-2">Admin</h1>
-        <p>Nemaš pristup.</p>
-      </div>
-    );
-  }
+  run();
+}, []);
 
+if (loading) {
   return (
     <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Admin panel</h1>
-
-      <div className="mb-6">
-        <Link href="/admin/employees" className="underline">
-          Pregled zaposlenih
-        </Link>
-      </div>
-
-      <ul className="space-y-3">
-        {users.map((u) => (
-          <li key={u.id} className="border p-4 rounded flex justify-between">
-            <span>{u.name}</span>
-            <span>{u.role}</span>
-          </li>
-        ))}
-      </ul>
+      <h1 className="text-2xl font-bold mb-2">Admin</h1>
+      <p>Učitavanje...</p>
     </div>
   );
+}
+
+if (!me || me.role !== "ADMIN") {
+  return (
+    <div className="p-6 max-w-4xl mx-auto">
+      <h1 className="text-2xl font-bold mb-2">Admin</h1>
+      <p>Nemaš pristup.</p>
+    </div>
+  );
+}
+
+return (
+  <div className="p-6 max-w-4xl mx-auto">
+    <h1 className="text-2xl font-bold mb-4">Admin panel</h1>
+
+    <div className="grid gap-2 mt-3">
+<Link href="/admin/employees" className="underline">
+Pregled zaposlenih
+</Link>
+
+<Link href="/admin/services" className="underline">
+Pregled usluga
+</Link>
+
+<Link href="/admin/appointments" className="underline">
+Pregled rezervacija
+</Link>
+</div>
+
+    <ul className="space-y-3">
+      {users.map((u) => (
+        <li key={u.id} className="border p-4 rounded flex justify-between">
+          <span>{u.name}</span>
+          <span>{u.role}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+);
 }

@@ -3,10 +3,7 @@
 import { useEffect, useState } from "react";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
-import {
-  getAppointments,
-  updateAppointmentStatus,
-} from "@/lib/appointments.client";
+import { getAppointments, updateAppointmentStatus } from "@/lib/appointments.client";
 import { BookingDto, BookingStatus } from "@/shared/types";
 
 export default function AdminAppointmentsPage() {
@@ -54,18 +51,10 @@ export default function AdminAppointmentsPage() {
               </div>
 
               <div className="flex gap-2 flex-wrap">
-                <Button onClick={() => setStatus(b.id, "ZAKAZAN")}>
-                  Zakaži
-                </Button>
-                <Button onClick={() => setStatus(b.id, "U_TOKU")}>
-                  U toku
-                </Button>
-                <Button onClick={() => setStatus(b.id, "ZAVRSEN")}>
-                  Završeno
-                </Button>
-                <Button onClick={() => setStatus(b.id, "OTKAZAN")}>
-                  Otkaži
-                </Button>
+                <Button onClick={() => setStatus(b.id, "ZAKAZAN")}>Zakaži</Button>
+                <Button onClick={() => setStatus(b.id, "U_TOKU")}>U toku</Button>
+                <Button onClick={() => setStatus(b.id, "ZAVRSEN")}>Završeno</Button>
+                <Button onClick={() => setStatus(b.id, "OTKAZAN")}>Otkaži</Button>
               </div>
             </Card>
           ))}

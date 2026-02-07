@@ -1,4 +1,3 @@
-// src/mock/data.ts
 import { BookingDto, EmployeeDto, ServiceDto, ShiftDto, UserDto } from "@/shared/types";
 
 export const mockUsers: UserDto[] = [
@@ -21,23 +20,23 @@ export const mockShifts: ShiftDto[] = [
   { id: "sh2", employeeId: "e2", date: "2026-02-10", startTime: "12:00", endTime: "20:00" },
 ];
 
-export const mockBookings = [
+export const mockBookings: BookingDto[] = [
   {
     id: "b1",
     date: "2026-02-10",
     startTime: "10:00",
     endTime: "11:00",
-    status: "ZAKAZANO",
+    status: "ZAKAZAN",
     serviceName: "Šišanje",
-    employeeName: "Ana",
+    employeeName: "Jovana",
   },
   {
     id: "b2",
     date: "2026-02-11",
     startTime: "12:00",
     endTime: "13:00",
-    status: "OTKAZANO",
+    status: "OTKAZAN",
     serviceName: "Feniranje",
-    employeeName: "Marija",
+    employeeName: "Teodora",
   },
 ];

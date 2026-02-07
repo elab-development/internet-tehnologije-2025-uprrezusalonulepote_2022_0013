@@ -1,36 +1,31 @@
-import { BookingDto } from "@/shared/types";
+import { BookingDto, BookingStatus } from "@/shared/types";
 import { mockBookings } from "@/mock/data";
 
+// kasnije: USE_MOCK = false
 const USE_MOCK = true;
 
 export async function getAppointments(): Promise<BookingDto[]> {
-  if (USE_MOCK) return mockBookings;
+  if (USE_MOCK) {
+    return Promise.resolve(mockBookings);
+  }
   return [];
 }
 
-export type CreateBookingInput = {
-  date: string;
-  startTime: string;
-  endTime: string;
-  serviceName: string;
-  employeeName: string;
-};
-
-export async function createAppointment(input: CreateBookingInput): Promise<BookingDto> {
+export async function updateAppointmentStatus(
+  id: string,
+  status: BookingStatus
+): Promise<void> {
   if (USE_MOCK) {
-    const newBooking: BookingDto = {
-      id: "b" + (mockBookings.length + 1),
-      status: "ZAKAZANO",
-      ...input,
+    const idx = mockBookings.findIndex((b) => b.id === id);
+    if (idx === -1) throw new Error("Rezervacija nije pronađena");
+
+    mockBookings[idx] = {
+      ...mockBookings[idx],
+      status,
     };
-    mockBookings.unshift(newBooking);
-    return newBooking;
+
+    return Promise.resolve();
   }
 
-  // placeholder za backend
-  return {
-    id: "server",
-    status: "ZAKAZANO",
-    ...input,
-  };
+  throw new Error("Backend nije implementiran");
 }

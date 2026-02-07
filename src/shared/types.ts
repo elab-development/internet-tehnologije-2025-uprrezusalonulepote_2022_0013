@@ -43,7 +43,7 @@ export type BookingDto = {
   date: string;
   startTime: string;
   endTime: string;
-  status: string;
+  status: BookingStatus;
   serviceName: string;
   employeeName: string;
 };
