@@ -1,17 +1,5 @@
-import { AUTH_COOKIE } from "@/app/lib/auth";
-import { NextResponse } from "next/server";
+import { logoutController } from "@/app/controllers/auth/logout.controller";
 
 export async function POST() {
-  const res = NextResponse.json({ ok: true });
-
-  res.cookies.set(AUTH_COOKIE, "", {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
-    maxAge: 0,
-    expires: new Date(0), // 01.01.1970 → browser briše cookie
-  });
-
-  return res;
+  return logoutController();
 }
