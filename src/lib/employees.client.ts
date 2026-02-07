@@ -2,8 +2,26 @@ import { EmployeeDto, ServiceDto, ShiftDto } from "@/shared/types";
 import { mockEmployees, mockServices, mockShifts } from "@/mock/data";
 
 
+// mock-first in-memory store (važi dok je dev server upaljen)
+let employeesStore = [...mockEmployees];
+
 export async function getAllEmployees(): Promise<EmployeeDto[]> {
-  return mockEmployees;
+  return employeesStore;
+}
+
+export async function updateEmployeeMock(
+  id: string,
+  patch: Partial<Pick<EmployeeDto, "name" | "email" | "phone" | "jobTitle">>
+): Promise<EmployeeDto | null> {
+  const idx = employeesStore.findIndex((e) => e.id === id);
+  if (idx === -1) return null;
+
+  employeesStore[idx] = {
+    ...employeesStore[idx],
+    ...patch,
+  };
+
+  return employeesStore[idx];
 }
 
 export async function getEmployeeServicesMap(): Promise<Record<string, ServiceDto[]>> {

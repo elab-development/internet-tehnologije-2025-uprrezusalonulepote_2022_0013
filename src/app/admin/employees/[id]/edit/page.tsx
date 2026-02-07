@@ -4,14 +4,14 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { authMe } from "@/lib/auth.client";
-import { getAllEmployees } from "@/lib/employees.client";
+import { getAllEmployees, updateEmployeeMock } from "@/lib/employees.client";
 import { EmployeeDto, UserDto } from "@/shared/types";
 
 type FormState = {
   name: string;
   email: string;
   phone: string;
-  jobTitle: string;
+  jobTitle: EmployeeDto["jobTitle"] | "";
 };
 
 export default function AdminEmployeeEditPage() {
@@ -25,7 +25,7 @@ export default function AdminEmployeeEditPage() {
     name: "",
     email: "",
     phone: "",
-    jobTitle: "",
+    jobTitle: "FRIZER",
   });
   const [loading, setLoading] = useState(true);
 
@@ -44,7 +44,7 @@ export default function AdminEmployeeEditPage() {
             name: found.name ?? "",
             email: found.email ?? "",
             phone: found.phone ?? "",
-            jobTitle: found.jobTitle ?? "",
+            jobTitle: found.jobTitle ?? "FRIZER",
           });
         }
       }
@@ -59,12 +59,26 @@ export default function AdminEmployeeEditPage() {
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
-  function onSubmit(e: React.FormEvent) {
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    console.log("EDIT EMPLOYEE SUBMIT", { id: employeeId, ...form });
+    // jobTitle mora biti union (ne sme "")
+    const jobTitleSafe: EmployeeDto["jobTitle"] =
+      form.jobTitle === "" ? "FRIZER" : form.jobTitle;
 
-    alert("Sačuvano (mock) — vidi console.log");
+    const updated = await updateEmployeeMock(employeeId, {
+      name: form.name,
+      email: form.email,
+      phone: form.phone || undefined,
+      jobTitle: jobTitleSafe,
+    });
+
+    if (!updated) {
+      alert("Greška: zaposleni nije pronađen.");
+      return;
+    }
+
+    alert("Sačuvano (mock)");
     router.push(`/admin/employees/${employeeId}`);
   }
 
@@ -145,13 +159,18 @@ export default function AdminEmployeeEditPage() {
 
         <div>
           <label className="block text-sm opacity-80 mb-1">Pozicija</label>
-          <input
+          <select
             className="w-full border rounded px-3 py-2 bg-transparent"
-            value={form.jobTitle}
-            onChange={(e) => onChange("jobTitle", e.target.value)}
-            placeholder="npr. FRIZER / SMINKER"
+            value={form.jobTitle === "" ? "FRIZER" : form.jobTitle}
+            onChange={(e) =>
+              onChange("jobTitle", e.target.value as EmployeeDto["jobTitle"])
+            }
             required
-          />
+          >
+            <option value="FRIZER">FRIZER</option>
+            <option value="SMINKER">SMINKER</option>
+            <option value="KOZMETICAR">KOZMETICAR</option>
+          </select>
         </div>
 
         <div className="flex items-center gap-3">
