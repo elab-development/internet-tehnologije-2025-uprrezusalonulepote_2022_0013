@@ -47,7 +47,7 @@ export default function AdminEmployeeDetailsPage() {
   if (loading) {
     return (
       <div className="p-6 max-w-5xl mx-auto">
-        <h1 className="text-2xl font-bold mb-2">Zaposleni</h1>
+        <h1 className="text-2xl font-bold mb-2">Detalj zaposlenog</h1>
         <p>Učitavanje...</p>
       </div>
     );
@@ -56,7 +56,7 @@ export default function AdminEmployeeDetailsPage() {
   if (!me || me.role !== "ADMIN") {
     return (
       <div className="p-6 max-w-5xl mx-auto">
-        <h1 className="text-2xl font-bold mb-2">Zaposleni</h1>
+        <h1 className="text-2xl font-bold mb-2">Detalj zaposlenog</h1>
         <p>Nemaš pristup.</p>
       </div>
     );
@@ -65,12 +65,7 @@ export default function AdminEmployeeDetailsPage() {
   if (!employee) {
     return (
       <div className="p-6 max-w-5xl mx-auto">
-        <div className="flex items-center justify-between gap-4 mb-4">
-          <h1 className="text-2xl font-bold">Detalj zaposlenog</h1>
-          <Link href="/admin/employees" className="underline">
-            Nazad na listu
-          </Link>
-        </div>
+        <h1 className="text-2xl font-bold mb-2">Detalj zaposlenog</h1>
         <p>Zaposleni nije pronađen.</p>
       </div>
     );
@@ -78,24 +73,39 @@ export default function AdminEmployeeDetailsPage() {
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
+      {/* HEADER – OVDE JE IZMENI */}
       <div className="flex items-center justify-between gap-4 mb-6">
         <h1 className="text-2xl font-bold">Detalj zaposlenog</h1>
-        <Link href="/admin/employees" className="underline">
-          Nazad na listu
-        </Link>
+
+        <div className="flex items-center gap-4">
+          <Link
+            href={`/admin/employees/${employeeId}/edit`}
+            className="underline"
+          >
+            Izmeni
+          </Link>
+
+          <Link href="/admin/employees" className="underline">
+            Nazad na listu
+          </Link>
+        </div>
       </div>
 
+      {/* OSNOVNI PODACI */}
       <div className="border rounded p-4 mb-6">
         <div className="flex items-start justify-between gap-4">
           <div>
             <div className="text-xl font-semibold">{employee.name}</div>
             <div className="opacity-80 text-sm">{employee.email}</div>
-            {employee.phone ? <div className="opacity-80 text-sm">{employee.phone}</div> : null}
+            {employee.phone && (
+              <div className="opacity-80 text-sm">{employee.phone}</div>
+            )}
           </div>
           <div className="text-sm opacity-70">{employee.jobTitle}</div>
         </div>
       </div>
 
+      {/* USLUGE */}
       <div className="border rounded p-4 mb-6">
         <div className="font-semibold mb-2">Usluge</div>
         {services.length ? (
@@ -111,6 +121,7 @@ export default function AdminEmployeeDetailsPage() {
         )}
       </div>
 
+      {/* SMENE */}
       <div className="border rounded p-4">
         <div className="font-semibold mb-2">Smene</div>
         {shifts.length ? (
@@ -122,11 +133,11 @@ export default function AdminEmployeeDetailsPage() {
                   <span>
                     {sh.startTime}–{sh.endTime}
                   </span>
-                  {sh.breakStart && sh.breakEnd ? (
+                  {sh.breakStart && sh.breakEnd && (
                     <span className="opacity-80">
                       Pauza: {sh.breakStart}–{sh.breakEnd}
                     </span>
-                  ) : null}
+                  )}
                 </div>
               </li>
             ))}
