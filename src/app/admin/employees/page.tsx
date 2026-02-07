@@ -69,6 +69,7 @@ export default function AdminEmployeesPage() {
       <ul className="space-y-3">
         {employees.map((e) => (
           <li key={e.id} className="border p-4 rounded">
+            <Link href={`/admin/employees/${e.id}`} className="block">
             <div className="flex flex-col gap-1">
               <div className="flex items-center justify-between gap-4">
                 <span className="font-semibold">{e.name}</span>
@@ -123,6 +124,7 @@ export default function AdminEmployeesPage() {
                 )}
               </div>
             </div>
+            </Link>
           </li>
         ))}
       </ul>
