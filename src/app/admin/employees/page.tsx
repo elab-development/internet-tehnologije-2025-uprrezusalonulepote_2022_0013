@@ -3,15 +3,18 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { authMe } from "@/lib/auth.client";
-import { getAllEmployees, getEmployeeServicesMap } from "@/lib/employees.client";
-import { EmployeeDto, UserDto, ServiceDto } from "@/shared/types";
+import {
+  getAllEmployees,
+  getEmployeeServicesMap,
+  getEmployeeShiftsMap,
+} from "@/lib/employees.client";
+import { EmployeeDto, ServiceDto, ShiftDto, UserDto } from "@/shared/types";
 
 export default function AdminEmployeesPage() {
   const [me, setMe] = useState<UserDto | null>(null);
   const [employees, setEmployees] = useState<EmployeeDto[]>([]);
-  const [servicesByEmployee, setServicesByEmployee] = useState<
-    Record<string, ServiceDto[]>
-  >({});
+  const [servicesByEmployee, setServicesByEmployee] = useState<Record<string, ServiceDto[]>>({});
+  const [shiftsByEmployee, setShiftsByEmployee] = useState<Record<string, ShiftDto[]>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -25,6 +28,9 @@ export default function AdminEmployeesPage() {
 
         const servicesMap = await getEmployeeServicesMap();
         setServicesByEmployee(servicesMap);
+
+        const shiftsMap = await getEmployeeShiftsMap();
+        setShiftsByEmployee(shiftsMap);
       }
 
       setLoading(false);
@@ -70,15 +76,11 @@ export default function AdminEmployeesPage() {
               </div>
 
               <div className="text-sm opacity-80">{e.email}</div>
+              {e.phone ? <div className="text-sm opacity-80">{e.phone}</div> : null}
 
-              {e.phone && (
-                <div className="text-sm opacity-80">{e.phone}</div>
-              )}
-
+              {/* USLUGE */}
               <div className="mt-3 text-sm opacity-80">
-                <div className="font-semibold opacity-90 mb-1">
-                  Usluge:
-                </div>
+                <div className="font-semibold opacity-90 mb-1">Usluge:</div>
 
                 {servicesByEmployee[e.id]?.length ? (
                   <ul className="list-disc pl-5 space-y-1">
@@ -90,6 +92,34 @@ export default function AdminEmployeesPage() {
                   </ul>
                 ) : (
                   <p className="opacity-70">Nema dodeljenih usluga.</p>
+                )}
+              </div>
+
+              {/* SMENE */}
+              <div className="mt-3 text-sm opacity-80">
+                <div className="font-semibold opacity-90 mb-1">Smene:</div>
+
+                {shiftsByEmployee[e.id]?.length ? (
+                  <ul className="space-y-2">
+                    {shiftsByEmployee[e.id].map((sh) => (
+                      <li key={sh.id} className="border rounded p-3">
+                        <div className="flex flex-wrap gap-x-4 gap-y-1">
+                          <span className="font-semibold">{sh.date}</span>
+                          <span>
+                            {sh.startTime}–{sh.endTime}
+                          </span>
+
+                          {sh.breakStart && sh.breakEnd ? (
+                            <span className="opacity-80">
+                              Pauza: {sh.breakStart}–{sh.breakEnd}
+                            </span>
+                          ) : null}
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="opacity-70">Nema unetih smena.</p>
                 )}
               </div>
             </div>
