@@ -3,12 +3,15 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { authMe } from "@/lib/auth.client";
-import { getAllEmployees } from "@/lib/employees.client";
-import { EmployeeDto, UserDto } from "@/shared/types";
+import { getAllEmployees, getEmployeeServicesMap } from "@/lib/employees.client";
+import { EmployeeDto, UserDto, ServiceDto } from "@/shared/types";
 
 export default function AdminEmployeesPage() {
   const [me, setMe] = useState<UserDto | null>(null);
   const [employees, setEmployees] = useState<EmployeeDto[]>([]);
+  const [servicesByEmployee, setServicesByEmployee] = useState<
+    Record<string, ServiceDto[]>
+  >({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -19,6 +22,9 @@ export default function AdminEmployeesPage() {
       if (current?.role === "ADMIN") {
         const list = await getAllEmployees();
         setEmployees(list);
+
+        const servicesMap = await getEmployeeServicesMap();
+        setServicesByEmployee(servicesMap);
       }
 
       setLoading(false);
@@ -65,7 +71,27 @@ export default function AdminEmployeesPage() {
 
               <div className="text-sm opacity-80">{e.email}</div>
 
-              {e.phone ? <div className="text-sm opacity-80">{e.phone}</div> : null}
+              {e.phone && (
+                <div className="text-sm opacity-80">{e.phone}</div>
+              )}
+
+              <div className="mt-3 text-sm opacity-80">
+                <div className="font-semibold opacity-90 mb-1">
+                  Usluge:
+                </div>
+
+                {servicesByEmployee[e.id]?.length ? (
+                  <ul className="list-disc pl-5 space-y-1">
+                    {servicesByEmployee[e.id].map((s) => (
+                      <li key={s.id}>
+                        {s.name} ({s.durationMin} min, {s.priceRsd} RSD)
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="opacity-70">Nema dodeljenih usluga.</p>
+                )}
+              </div>
             </div>
           </li>
         ))}
