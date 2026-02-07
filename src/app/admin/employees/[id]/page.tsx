@@ -85,6 +85,10 @@ export default function AdminEmployeeDetailsPage() {
             Izmeni
           </Link>
 
+          <Link href={`/admin/employees/${employeeId}/shifts`} className="underline">
+            Izmeni smene
+          </Link>
+
           <Link href="/admin/employees" className="underline">
             Nazad na listu
           </Link>

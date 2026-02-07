@@ -5,6 +5,9 @@ import { mockEmployees, mockServices, mockShifts } from "@/mock/data";
 // mock-first in-memory store (važi dok je dev server upaljen)
 let employeesStore = [...mockEmployees];
 
+// mock-first in-memory store (važi dok je dev server upaljen)
+let shiftsStore = [...mockShifts];
+
 export async function getAllEmployees(): Promise<EmployeeDto[]> {
   return employeesStore;
 }
@@ -40,7 +43,7 @@ export async function getEmployeeServicesMap(): Promise<Record<string, ServiceDt
 export async function getEmployeeShiftsMap(): Promise<Record<string, ShiftDto[]>> {
   const map: Record<string, ShiftDto[]> = {};
 
-  for (const sh of mockShifts) {
+  for (const sh of shiftsStore) {
     if (!map[sh.employeeId]) map[sh.employeeId] = [];
     map[sh.employeeId].push(sh);
   }
@@ -55,4 +58,15 @@ export async function getEmployeeShiftsMap(): Promise<Record<string, ShiftDto[]>
   }
 
   return map;
+}
+
+export async function updateShiftMock(
+  shiftId: string,
+  patch: Partial<Pick<ShiftDto, "date" | "startTime" | "endTime" | "breakStart" | "breakEnd">>
+): Promise<ShiftDto | null> {
+  const idx = shiftsStore.findIndex((s) => s.id === shiftId);
+  if (idx === -1) return null;
+
+  shiftsStore[idx] = { ...shiftsStore[idx], ...patch };
+  return shiftsStore[idx];
 }
