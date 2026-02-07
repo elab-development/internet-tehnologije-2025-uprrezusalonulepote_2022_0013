@@ -59,9 +59,9 @@ export default function ServicesPage() {
 
       {}
       <ServiceForm
-        onCreated={async () => {
-          const s = await getServices();
-          setServices(s);
+        onSaved={async () => {
+        const s = await getServices();
+        setServices(s);
         }}
       />
 

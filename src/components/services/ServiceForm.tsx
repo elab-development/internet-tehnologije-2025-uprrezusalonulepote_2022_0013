@@ -1,22 +1,34 @@
 "use client";
 
-import { useState } from "react";
-import { createService } from "@/lib/services.client";
+import { useEffect, useState } from "react";
+import { createService, updateService } from "@/lib/services.client";
 import Card from "@/components/ui/Card";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 import { ServiceDto } from "@/shared/types";
 
 type Props = {
-  onCreated?: (service: ServiceDto) => void;
+  initial?: ServiceDto | null; // ako postoji => edit
+  onSaved?: (service: ServiceDto) => void;
 };
 
-export default function ServiceForm({ onCreated }: Props) {
+export default function ServiceForm({ initial, onSaved }: Props) {
+  const isEdit = Boolean(initial?.id);
+
   const [name, setName] = useState("Šišanje");
   const [durationMin, setDurationMin] = useState(45);
   const [priceRsd, setPriceRsd] = useState(2500);
   const [employeeIdsText, setEmployeeIdsText] = useState("e1"); // csv: e1,e2
   const [err, setErr] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!initial) return;
+
+    setName(initial.name ?? "");
+    setDurationMin(initial.durationMin ?? 30);
+    setPriceRsd(initial.priceRsd ?? 0);
+    setEmployeeIdsText((initial.employeeIds ?? []).join(","));
+  }, [initial]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -28,21 +40,27 @@ export default function ServiceForm({ onCreated }: Props) {
         .map((x) => x.trim())
         .filter(Boolean);
 
-      const created = await createService({
+      const payload = {
         name,
         durationMin: Number(durationMin),
         priceRsd: Number(priceRsd),
         employeeIds,
-        createdAt: new Date().toISOString(),
-      });
+        createdAt: initial?.createdAt ?? new Date().toISOString(),
+      };
 
-      onCreated?.(created);
+      const saved = isEdit
+        ? await updateService(initial!.id, payload)
+        : await createService(payload);
 
-      //opcionalno reset:
-      setName("");
-      setDurationMin(30);
-      setPriceRsd(0);
-      setEmployeeIdsText("");
+      onSaved?.(saved);
+
+      // reset samo kad dodaješ novu
+      if (!isEdit) {
+        setName("");
+        setDurationMin(30);
+        setPriceRsd(0);
+        setEmployeeIdsText("");
+      }
     } catch (e) {
       if (e instanceof Error) setErr(e.message);
       else setErr("Greška");
@@ -51,7 +69,9 @@ export default function ServiceForm({ onCreated }: Props) {
 
   return (
     <Card className="mb-6">
-      <h2 className="font-semibold mb-3">Dodaj uslugu</h2>
+      <h2 className="font-semibold mb-3">
+        {isEdit ? "Izmeni uslugu" : "Dodaj uslugu"}
+      </h2>
 
       {err && <div className="border p-2 rounded mb-3 text-sm">{err}</div>}
 
@@ -83,7 +103,7 @@ export default function ServiceForm({ onCreated }: Props) {
           placeholder="ID-jevi zaposlenih (npr: e1,e2)"
         />
 
-        <Button type="submit">Sačuvaj uslugu</Button>
+        <Button type="submit">{isEdit ? "Sačuvaj izmene" : "Sačuvaj uslugu"}</Button>
       </form>
     </Card>
   );
