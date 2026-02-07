@@ -4,6 +4,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createService } from "@/lib/services.client";
 
+import Card from "@/components/ui/Card";
+import Input from "@/components/ui/Input";
+import Button from "@/components/ui/Button";
+
 export default function ServiceForm() {
   const router = useRouter();
 
@@ -31,38 +35,37 @@ export default function ServiceForm() {
         createdAt: new Date().toISOString(),
       });
 
-      // refetch server page (getServices)
       router.refresh();
-
     } catch (e: any) {
       setErr(e?.message ?? "Greška");
     }
   }
 
   return (
-    <div className="border rounded-lg p-4 mb-6">
+    <Card className="mb-6">
       <h2 className="font-semibold mb-3">Dodaj uslugu</h2>
 
-      {err && <div className="border p-2 rounded mb-3">{err}</div>}
+      {err && (
+        <div className="border p-2 rounded mb-3 text-sm">
+          {err}
+        </div>
+      )}
 
       <form onSubmit={onSubmit} className="grid gap-3">
-        <input
-          className="border p-2 rounded"
+        <Input
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Naziv usluge"
         />
 
         <div className="grid grid-cols-2 gap-3">
-          <input
-            className="border p-2 rounded"
+          <Input
             type="number"
             value={durationMin}
             onChange={(e) => setDurationMin(Number(e.target.value))}
             placeholder="Trajanje (min)"
           />
-          <input
-            className="border p-2 rounded"
+          <Input
             type="number"
             value={priceRsd}
             onChange={(e) => setPriceRsd(Number(e.target.value))}
@@ -70,17 +73,14 @@ export default function ServiceForm() {
           />
         </div>
 
-        <input
-          className="border p-2 rounded"
+        <Input
           value={employeeIdsText}
           onChange={(e) => setEmployeeIdsText(e.target.value)}
           placeholder="ID-jevi zaposlenih (npr: e1,e2)"
         />
 
-        <button className="bg-black text-white p-2 rounded">
-          Sačuvaj uslugu
-        </button>
+        <Button type="submit">Sačuvaj uslugu</Button>
       </form>
-    </div>
+    </Card>
   );
 }
