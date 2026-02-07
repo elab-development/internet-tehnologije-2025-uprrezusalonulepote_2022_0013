@@ -1,12 +1,52 @@
 import { EmployeeDto, ServiceDto, ShiftDto } from "@/shared/types";
 import { mockEmployees, mockServices, mockShifts } from "@/mock/data";
 
+const SHIFTS_LS_KEY = "mock_shifts";
 
-// mock-first in-memory store (važi dok je dev server upaljen)
-let employeesStore = [...mockEmployees];
+function loadShiftsFromLS(): ShiftDto[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(SHIFTS_LS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
 
-// mock-first in-memory store (važi dok je dev server upaljen)
-let shiftsStore = [...mockShifts];
+function saveShiftsToLS(shifts: ShiftDto[]) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(SHIFTS_LS_KEY, JSON.stringify(shifts));
+}
+
+
+const EMPLOYEES_LS_KEY = "mock_employees";
+
+function loadEmployeesFromLS(): EmployeeDto[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(EMPLOYEES_LS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveEmployeesToLS(employees: EmployeeDto[]) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(EMPLOYEES_LS_KEY, JSON.stringify(employees));
+}
+
+
+let employeesStore: EmployeeDto[] =
+  typeof window !== "undefined" && loadEmployeesFromLS().length
+    ? loadEmployeesFromLS()
+    : [...mockEmployees];
+
+
+let shiftsStore: ShiftDto[] =
+  typeof window !== "undefined" && loadShiftsFromLS().length
+    ? loadShiftsFromLS()
+    : [...mockShifts];
 
 export async function getAllEmployees(): Promise<EmployeeDto[]> {
   return employeesStore;
@@ -24,6 +64,7 @@ export async function updateEmployeeMock(
     ...patch,
   };
 
+  saveEmployeesToLS(employeesStore);
   return employeesStore[idx];
 }
 
@@ -68,6 +109,8 @@ export async function updateShiftMock(
   if (idx === -1) return null;
 
   shiftsStore[idx] = { ...shiftsStore[idx], ...patch };
+  saveShiftsToLS(shiftsStore);
+
   return shiftsStore[idx];
 }
 
@@ -80,5 +123,7 @@ export async function createShiftMock(
   };
 
   shiftsStore.push(newShift);
+  saveShiftsToLS(shiftsStore);
+
   return newShift;
 }
