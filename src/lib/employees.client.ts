@@ -70,3 +70,15 @@ export async function updateShiftMock(
   shiftsStore[idx] = { ...shiftsStore[idx], ...patch };
   return shiftsStore[idx];
 }
+
+export async function createShiftMock(
+  shift: Omit<ShiftDto, "id">
+): Promise<ShiftDto> {
+  const newShift: ShiftDto = {
+    id: `sh_${Date.now()}`,
+    ...shift,
+  };
+
+  shiftsStore.push(newShift);
+  return newShift;
+}

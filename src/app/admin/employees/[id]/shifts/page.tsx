@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { authMe } from "@/lib/auth.client";
-import { getAllEmployees, getEmployeeShiftsMap, updateShiftMock } from "@/lib/employees.client";
+import { getAllEmployees, getEmployeeShiftsMap, updateShiftMock, createShiftMock } from "@/lib/employees.client";
 import { EmployeeDto, ShiftDto, UserDto } from "@/shared/types";
 
 type ShiftForm = {
@@ -27,6 +27,16 @@ export default function AdminEmployeeShiftsPage() {
   const [loading, setLoading] = useState(true);
 
   const [editing, setEditing] = useState<ShiftForm | null>(null);
+
+  const [adding, setAdding] = useState(false);
+
+  const [newShift, setNewShift] = useState({
+    date: "",
+    startTime: "",
+    endTime: "",
+    breakStart: "",
+    breakEnd: "",
+  });
 
   useEffect(() => {
     async function run() {
@@ -81,6 +91,24 @@ export default function AdminEmployeeShiftsPage() {
     alert("Sačuvano (mock)");
   }
 
+  async function saveNewShift(e: React.FormEvent) {
+  e.preventDefault();
+
+  const created = await createShiftMock({
+    employeeId,
+    date: newShift.date,
+    startTime: newShift.startTime,
+    endTime: newShift.endTime,
+    breakStart: newShift.breakStart || undefined,
+    breakEnd: newShift.breakEnd || undefined,
+  });
+
+  setShifts((prev) => [...prev, created]);
+  setAdding(false);
+  setNewShift({ date: "", startTime: "", endTime: "", breakStart: "", breakEnd: "" });
+  alert("Smena dodata (mock)");
+}
+
   if (loading) {
     return (
       <div className="p-6 max-w-5xl mx-auto">
@@ -123,7 +151,19 @@ export default function AdminEmployeeShiftsPage() {
       </div>
 
       <div className="border rounded p-4">
-        <div className="font-semibold mb-3">Smene</div>
+        <div className="flex items-center justify-between mb-3">
+        <div className="font-semibold">Smene</div>
+
+        <button
+          className="border rounded px-3 py-1"
+          onClick={() => {
+          setAdding(true);
+          setEditing(null);
+        }}
+        >
+        Dodaj smenu
+      </button>
+      </div>
 
         {shifts.length ? (
           <ul className="space-y-2">
@@ -153,6 +193,88 @@ export default function AdminEmployeeShiftsPage() {
           <p className="opacity-70">Nema unetih smena.</p>
         )}
       </div>
+
+
+
+
+        
+        {adding ? (
+          <div className="border rounded p-4 mt-6">
+    <div className="font-semibold mb-3">Nova smena</div>
+
+    <form onSubmit={saveNewShift} className="space-y-3">
+      <div>
+        <label className="block text-sm opacity-80 mb-1">Datum</label>
+        <input
+          className="w-full border rounded px-3 py-2 bg-transparent"
+          value={newShift.date}
+          onChange={(e) => setNewShift((p) => ({ ...p, date: e.target.value }))}
+          placeholder="YYYY-MM-DD"
+          required
+        />
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label className="block text-sm opacity-80 mb-1">Početak</label>
+          <input
+            className="w-full border rounded px-3 py-2 bg-transparent"
+            value={newShift.startTime}
+            onChange={(e) => setNewShift((p) => ({ ...p, startTime: e.target.value }))}
+            placeholder="HH:mm"
+            required
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm opacity-80 mb-1">Kraj</label>
+          <input
+            className="w-full border rounded px-3 py-2 bg-transparent"
+            value={newShift.endTime}
+            onChange={(e) => setNewShift((p) => ({ ...p, endTime: e.target.value }))}
+            placeholder="HH:mm"
+            required
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label className="block text-sm opacity-80 mb-1">Pauza start (opciono)</label>
+          <input
+            className="w-full border rounded px-3 py-2 bg-transparent"
+            value={newShift.breakStart}
+            onChange={(e) => setNewShift((p) => ({ ...p, breakStart: e.target.value }))}
+            placeholder="HH:mm"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm opacity-80 mb-1">Pauza end (opciono)</label>
+          <input
+            className="w-full border rounded px-3 py-2 bg-transparent"
+            value={newShift.breakEnd}
+            onChange={(e) => setNewShift((p) => ({ ...p, breakEnd: e.target.value }))}
+            placeholder="HH:mm"
+          />
+        </div>
+      </div>
+
+      <div className="flex items-center gap-3">
+        <button className="border rounded px-4 py-2" type="submit">
+          Sačuvaj (mock)
+        </button>
+
+        <button className="underline text-sm" type="button" onClick={() => setAdding(false)}>
+          Otkaži
+        </button>
+      </div>
+    </form>
+  </div>
+) : null}
+
+
+
 
       {editing ? (
         <div className="border rounded p-4 mt-6">
