@@ -1,16 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { createService } from "@/lib/services.client";
-
 import Card from "@/components/ui/Card";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
+import { ServiceDto } from "@/shared/types";
 
-export default function ServiceForm() {
-  const router = useRouter();
+type Props = {
+  onCreated?: (service: ServiceDto) => void;
+};
 
+export default function ServiceForm({ onCreated }: Props) {
   const [name, setName] = useState("Šišanje");
   const [durationMin, setDurationMin] = useState(45);
   const [priceRsd, setPriceRsd] = useState(2500);
@@ -27,7 +28,7 @@ export default function ServiceForm() {
         .map((x) => x.trim())
         .filter(Boolean);
 
-      await createService({
+      const created = await createService({
         name,
         durationMin: Number(durationMin),
         priceRsd: Number(priceRsd),
@@ -35,9 +36,16 @@ export default function ServiceForm() {
         createdAt: new Date().toISOString(),
       });
 
-      router.refresh();
-    } catch (e: any) {
-      setErr(e?.message ?? "Greška");
+      onCreated?.(created);
+
+      //opcionalno reset:
+      setName("");
+      setDurationMin(30);
+      setPriceRsd(0);
+      setEmployeeIdsText("");
+    } catch (e) {
+      if (e instanceof Error) setErr(e.message);
+      else setErr("Greška");
     }
   }
 
@@ -45,11 +53,7 @@ export default function ServiceForm() {
     <Card className="mb-6">
       <h2 className="font-semibold mb-3">Dodaj uslugu</h2>
 
-      {err && (
-        <div className="border p-2 rounded mb-3 text-sm">
-          {err}
-        </div>
-      )}
+      {err && <div className="border p-2 rounded mb-3 text-sm">{err}</div>}
 
       <form onSubmit={onSubmit} className="grid gap-3">
         <Input
