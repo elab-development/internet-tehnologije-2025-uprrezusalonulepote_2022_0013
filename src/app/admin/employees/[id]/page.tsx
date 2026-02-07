@@ -74,26 +74,23 @@ export default function AdminEmployeeDetailsPage() {
   return (
     <div className="p-6 max-w-5xl mx-auto">
       {/* HEADER – OVDE JE IZMENI */}
-      <div className="flex items-center justify-between gap-4 mb-6">
-        <h1 className="text-2xl font-bold">Detalj zaposlenog</h1>
+        <div className="flex items-center justify-between gap-4 mb-6">
+            <h1 className="text-2xl font-bold">Detalj zaposlenog</h1>
 
-        <div className="flex items-center gap-4">
-          <Link
-            href={`/admin/employees/${employeeId}/edit`}
-            className="underline"
-          >
-            Izmeni
-          </Link>
+            <div className="flex items-center gap-4">
+            <Link href={`/admin/employees/${employeeId}/edit`} className="underline">
+                Izmeni zaposlenog
+            </Link>
 
-          <Link href={`/admin/employees/${employeeId}/shifts`} className="underline">
-            Izmeni smene
-          </Link>
+            <Link href={`/admin/employees/${employeeId}/shifts`} className="underline">
+                Izmeni smene
+            </Link>
 
-          <Link href="/admin/employees" className="underline">
-            Nazad na listu
-          </Link>
+            <Link href="/admin/employees" className="underline">
+                Nazad na listu
+            </Link>
         </div>
-      </div>
+    </div>
 
       {/* OSNOVNI PODACI */}
       <div className="border rounded p-4 mb-6">
