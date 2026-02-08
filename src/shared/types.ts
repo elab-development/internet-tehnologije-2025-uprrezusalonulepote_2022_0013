@@ -40,6 +40,7 @@ export type BookingStatus = "ZAKAZAN" | "U_TOKU" | "ZAVRSEN" | "OTKAZAN";
 
 export type BookingDto = {
   id: string;
+  userId: string; 
   date: string;
   startTime: string;
   endTime: string;
