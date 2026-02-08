@@ -1,20 +1,32 @@
-"use client";
-
 import { UserDto } from "@/shared/types";
 
-const LS_USER_KEY = "iteh_mock_user";
+const USER_KEY = "iteh_user_v1";
 
-// ako hoćeš, dodaj ovde email koji treba da bude ADMIN
-const ADMIN_EMAILS = new Set([
-  "mina@gmail.com",
-  "mina@admin.com",
-  "admin@test.com",
-]);
+/**
+ * Mock login – kreira usera, snima ga u localStorage i vraća ga
+ */
+export function loginMock(email: string, name?: string): UserDto {
+  const user: UserDto = {
+    id: email, // stabilan id; može i crypto.randomUUID()
+    name: name ?? email.split("@")[0],
+    email,
+    role: "CLIENT", // promeni ako ti UserDto nema role ili koristi drugo polje
+  } as UserDto;
 
+  if (typeof window !== "undefined") {
+    window.localStorage.setItem(USER_KEY, JSON.stringify(user));
+  }
+
+  return user;
+}
+
+/**
+ * Dohvata trenutno ulogovanog mock usera
+ */
 export function getMockUser(): UserDto | null {
   if (typeof window === "undefined") return null;
 
-  const raw = window.localStorage.getItem(LS_USER_KEY);
+  const raw = window.localStorage.getItem(USER_KEY);
   if (!raw) return null;
 
   try {
@@ -24,39 +36,17 @@ export function getMockUser(): UserDto | null {
   }
 }
 
-// kompatibilnost sa kodom koji uvozi getCurrentUserFromStorage
-export function getCurrentUserFromStorage(): UserDto | null {
-  return getMockUser();
-}
-
-export function loginMock(email: string): UserDto {
-  const now = new Date().toISOString();
-  const e = email.trim().toLowerCase();
-
-  const isAdmin =
-    e.includes("admin") || ADMIN_EMAILS.has(e);
-
-  const user: UserDto = isAdmin
-    ? {
-        id: "u-admin",
-        name: "Mina Admin",
-        email,
-        role: "ADMIN",
-        createdAt: now,
-      }
-    : {
-        id: "u-client",
-        name: "Ana Klijent",
-        email,
-        role: "CLIENT",
-        createdAt: now,
-      };
-
-  window.localStorage.setItem(LS_USER_KEY, JSON.stringify(user));
-  return user;
-}
-
+/**
+ * Logout – briše usera iz storage-a
+ */
 export function clearMockUser() {
   if (typeof window === "undefined") return;
-  window.localStorage.removeItem(LS_USER_KEY);
+  window.localStorage.removeItem(USER_KEY);
+}
+
+/**
+ * NOVO – koristi se za filtriranje rezervacija (A2)
+ */
+export function getCurrentUserFromStorage() {
+  return getMockUser();
 }

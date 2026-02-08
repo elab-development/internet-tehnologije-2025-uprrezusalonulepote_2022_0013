@@ -5,7 +5,7 @@ import Card from "@/components/ui/Card";
 import AppointmentForm from "@/components/appointments/AppointmentForm";
 import { getAppointments } from "@/lib/appointments.client";
 import { BookingDto } from "@/shared/types";
-import { getMockUser } from "@/lib/session.client";
+import { getCurrentUserFromStorage } from "@/lib/session.client";
 
 export default function AppointmentsPage() {
   const [items, setItems] = useState<BookingDto[]>([]);
@@ -15,7 +15,7 @@ export default function AppointmentsPage() {
   setLoading(true);
 
   const list = await getAppointments();
-  const me = getMockUser();
+  const me = getCurrentUserFromStorage();
 
   if (!me) {
     setItems([]);
@@ -35,7 +35,10 @@ export default function AppointmentsPage() {
     <div className="max-w-3xl mx-auto">
       <h1 className="text-xl font-semibold mb-4">Termini</h1>
 
-      <AppointmentForm onCreated={() => refresh()} />
+      <AppointmentForm onCreated={async () => {
+    await refresh();
+  }}
+/>
 
       <h2 className="font-semibold mb-3">Rezervacije</h2>
 

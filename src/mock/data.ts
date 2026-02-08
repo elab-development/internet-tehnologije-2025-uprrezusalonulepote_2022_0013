@@ -23,6 +23,7 @@ export const mockShifts: ShiftDto[] = [
 export const mockBookings: BookingDto[] = [
   {
     id: "b1",
+    userId: "u1",
     date: "2026-02-10",
     startTime: "10:00",
     endTime: "11:00",
@@ -32,6 +33,7 @@ export const mockBookings: BookingDto[] = [
   },
   {
     id: "b2",
+    userId: "u1",
     date: "2026-02-11",
     startTime: "12:00",
     endTime: "13:00",

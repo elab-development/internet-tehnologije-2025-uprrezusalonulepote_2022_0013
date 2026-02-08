@@ -8,6 +8,7 @@ import { getAllEmployees } from "@/lib/employees.client";
 import { getServices } from "@/lib/services.client";
 import { createAppointment } from "@/lib/appointments.client";
 import { BookingDto, BookingStatus, EmployeeDto, ServiceDto } from "@/shared/types";
+import { getCurrentUserFromStorage } from "@/lib/session.client";
 
 type Props = {
 onCreated?: (booking: BookingDto) => void;
@@ -74,8 +75,11 @@ async function onSubmit(e: React.FormEvent) {
     const endM = String(endMin % 60).padStart(2, "0");
     const endTime = `${endH}:${endM}`;
 
+    const me = getCurrentUserFromStorage();
+    if (!me) throw new Error("Nisi ulogovan");
+
     const created = await createAppointment({
-userId: "u1", // TEMP (A2: uzimamo iz auth-a)
+userId: me.id, // TEMP (A2: uzimamo iz auth-a)
 date,
 startTime,
 endTime,
