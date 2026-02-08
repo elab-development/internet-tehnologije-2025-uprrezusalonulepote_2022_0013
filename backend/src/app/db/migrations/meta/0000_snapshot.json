@@ -1,0 +1,493 @@
+{
+  "id": "9d706abe-627a-484d-a436-15094a2ce4c3",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.klijenti": {
+      "name": "klijenti",
+      "schema": "",
+      "columns": {
+        "id_klijenta": {
+          "name": "id_klijenta",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "ime": {
+          "name": "ime",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "prezime": {
+          "name": "prezime",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(120)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lozinka": {
+          "name": "lozinka",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "br_telefona": {
+          "name": "br_telefona",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "adresa": {
+          "name": "adresa",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "korisnicko_ime": {
+          "name": "korisnicko_ime",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "klijenti_email_uq": {
+          "name": "klijenti_email_uq",
+          "columns": [
+            {
+              "expression": "email",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "klijenti_korisnickoime_uq": {
+          "name": "klijenti_korisnickoime_uq",
+          "columns": [
+            {
+              "expression": "korisnicko_ime",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.radna_mesta": {
+      "name": "radna_mesta",
+      "schema": "",
+      "columns": {
+        "id_radnog_mesta": {
+          "name": "id_radnog_mesta",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "naziv": {
+          "name": "naziv",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.radne_smene": {
+      "name": "radne_smene",
+      "schema": "",
+      "columns": {
+        "id_smene": {
+          "name": "id_smene",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "datum": {
+          "name": "datum",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "pocetak_smene": {
+          "name": "pocetak_smene",
+          "type": "time",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kraj_smene": {
+          "name": "kraj_smene",
+          "type": "time",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "zaposleni_id": {
+          "name": "zaposleni_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "radne_smene_zaposleni_id_zaposleni_id_zaposleni_fk": {
+          "name": "radne_smene_zaposleni_id_zaposleni_id_zaposleni_fk",
+          "tableFrom": "radne_smene",
+          "tableTo": "zaposleni",
+          "columnsFrom": [
+            "zaposleni_id"
+          ],
+          "columnsTo": [
+            "id_zaposleni"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.rezervacija_usluge": {
+      "name": "rezervacija_usluge",
+      "schema": "",
+      "columns": {
+        "rezervacija_id": {
+          "name": "rezervacija_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "usluga_id": {
+          "name": "usluga_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "rezervacija_usluge_rezervacija_id_rezervacije_id_rezervacije_fk": {
+          "name": "rezervacija_usluge_rezervacija_id_rezervacije_id_rezervacije_fk",
+          "tableFrom": "rezervacija_usluge",
+          "tableTo": "rezervacije",
+          "columnsFrom": [
+            "rezervacija_id"
+          ],
+          "columnsTo": [
+            "id_rezervacije"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "rezervacija_usluge_usluga_id_usluge_id_usluga_fk": {
+          "name": "rezervacija_usluge_usluga_id_usluge_id_usluga_fk",
+          "tableFrom": "rezervacija_usluge",
+          "tableTo": "usluge",
+          "columnsFrom": [
+            "usluga_id"
+          ],
+          "columnsTo": [
+            "id_usluga"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "rezervacija_usluge_rezervacija_id_usluga_id_pk": {
+          "name": "rezervacija_usluge_rezervacija_id_usluga_id_pk",
+          "columns": [
+            "rezervacija_id",
+            "usluga_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.rezervacije": {
+      "name": "rezervacije",
+      "schema": "",
+      "columns": {
+        "id_rezervacije": {
+          "name": "id_rezervacije",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "datum_vreme": {
+          "name": "datum_vreme",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "napomena": {
+          "name": "napomena",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "klijent_id": {
+          "name": "klijent_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "zaposleni_id": {
+          "name": "zaposleni_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "rezervacije_klijent_id_klijenti_id_klijenta_fk": {
+          "name": "rezervacije_klijent_id_klijenti_id_klijenta_fk",
+          "tableFrom": "rezervacije",
+          "tableTo": "klijenti",
+          "columnsFrom": [
+            "klijent_id"
+          ],
+          "columnsTo": [
+            "id_klijenta"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "rezervacije_zaposleni_id_zaposleni_id_zaposleni_fk": {
+          "name": "rezervacije_zaposleni_id_zaposleni_id_zaposleni_fk",
+          "tableFrom": "rezervacije",
+          "tableTo": "zaposleni",
+          "columnsFrom": [
+            "zaposleni_id"
+          ],
+          "columnsTo": [
+            "id_zaposleni"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.usluge": {
+      "name": "usluge",
+      "schema": "",
+      "columns": {
+        "id_usluga": {
+          "name": "id_usluga",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "naziv": {
+          "name": "naziv",
+          "type": "varchar(120)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.zaposleni": {
+      "name": "zaposleni",
+      "schema": "",
+      "columns": {
+        "id_zaposleni": {
+          "name": "id_zaposleni",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "ime": {
+          "name": "ime",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "prezime": {
+          "name": "prezime",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(120)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lozinka": {
+          "name": "lozinka",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "radno_mesto_id": {
+          "name": "radno_mesto_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "zaposleni_email_uq": {
+          "name": "zaposleni_email_uq",
+          "columns": [
+            {
+              "expression": "email",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "zaposleni_radno_mesto_id_radna_mesta_id_radnog_mesta_fk": {
+          "name": "zaposleni_radno_mesto_id_radna_mesta_id_radnog_mesta_fk",
+          "tableFrom": "zaposleni",
+          "tableTo": "radna_mesta",
+          "columnsFrom": [
+            "radno_mesto_id"
+          ],
+          "columnsTo": [
+            "id_radnog_mesta"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.zaposleni_usluge": {
+      "name": "zaposleni_usluge",
+      "schema": "",
+      "columns": {
+        "zaposleni_id": {
+          "name": "zaposleni_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "usluga_id": {
+          "name": "usluga_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "zaposleni_usluge_zaposleni_id_zaposleni_id_zaposleni_fk": {
+          "name": "zaposleni_usluge_zaposleni_id_zaposleni_id_zaposleni_fk",
+          "tableFrom": "zaposleni_usluge",
+          "tableTo": "zaposleni",
+          "columnsFrom": [
+            "zaposleni_id"
+          ],
+          "columnsTo": [
+            "id_zaposleni"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "zaposleni_usluge_usluga_id_usluge_id_usluga_fk": {
+          "name": "zaposleni_usluge_usluga_id_usluge_id_usluga_fk",
+          "tableFrom": "zaposleni_usluge",
+          "tableTo": "usluge",
+          "columnsFrom": [
+            "usluga_id"
+          ],
+          "columnsTo": [
+            "id_usluga"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "zaposleni_usluge_zaposleni_id_usluga_id_pk": {
+          "name": "zaposleni_usluge_zaposleni_id_usluga_id_pk",
+          "columns": [
+            "zaposleni_id",
+            "usluga_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
