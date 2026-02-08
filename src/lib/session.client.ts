@@ -1,27 +1,62 @@
-import { UserDto } from "@/shared/types";
-import { mockUsers } from "@/mock/data";
-import { USE_MOCK } from "@/lib/config";
+"use client";
 
-const KEY = "mock_user";
+import { UserDto } from "@/shared/types";
+
+const LS_USER_KEY = "iteh_mock_user";
+
+// ako hoćeš, dodaj ovde email koji treba da bude ADMIN
+const ADMIN_EMAILS = new Set([
+  "mina@gmail.com",
+  "mina@admin.com",
+  "admin@test.com",
+]);
 
 export function getMockUser(): UserDto | null {
-  if (!USE_MOCK) return null;
-  const raw = typeof window !== "undefined" ? localStorage.getItem(KEY) : null;
-  return raw ? (JSON.parse(raw) as UserDto) : null;
+  if (typeof window === "undefined") return null;
+
+  const raw = window.localStorage.getItem(LS_USER_KEY);
+  if (!raw) return null;
+
+  try {
+    return JSON.parse(raw) as UserDto;
+  } catch {
+    return null;
+  }
 }
 
-export function setMockUser(user: UserDto) {
-  if (!USE_MOCK) return;
-  localStorage.setItem(KEY, JSON.stringify(user));
+// kompatibilnost sa kodom koji uvozi getCurrentUserFromStorage
+export function getCurrentUserFromStorage(): UserDto | null {
+  return getMockUser();
+}
+
+export function loginMock(email: string): UserDto {
+  const now = new Date().toISOString();
+  const e = email.trim().toLowerCase();
+
+  const isAdmin =
+    e.includes("admin") || ADMIN_EMAILS.has(e);
+
+  const user: UserDto = isAdmin
+    ? {
+        id: "u-admin",
+        name: "Mina Admin",
+        email,
+        role: "ADMIN",
+        createdAt: now,
+      }
+    : {
+        id: "u-client",
+        name: "Ana Klijent",
+        email,
+        role: "CLIENT",
+        createdAt: now,
+      };
+
+  window.localStorage.setItem(LS_USER_KEY, JSON.stringify(user));
+  return user;
 }
 
 export function clearMockUser() {
-  if (!USE_MOCK) return;
-  localStorage.removeItem(KEY);
-}
-
-export function loginMock(email: string) {
-  const user = mockUsers.find(u => u.email === email) ?? mockUsers[0];
-  setMockUser(user);
-  return user;
+  if (typeof window === "undefined") return;
+  window.localStorage.removeItem(LS_USER_KEY);
 }

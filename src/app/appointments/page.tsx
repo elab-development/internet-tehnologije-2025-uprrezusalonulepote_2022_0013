@@ -5,18 +5,28 @@ import Card from "@/components/ui/Card";
 import AppointmentForm from "@/components/appointments/AppointmentForm";
 import { getAppointments } from "@/lib/appointments.client";
 import { BookingDto } from "@/shared/types";
+import { getMockUser } from "@/lib/session.client";
 
 export default function AppointmentsPage() {
   const [items, setItems] = useState<BookingDto[]>([]);
   const [loading, setLoading] = useState(true);
 
   async function refresh() {
-    setLoading(true);
-    const list = await getAppointments();
-    setItems(list);
+  setLoading(true);
+
+  const list = await getAppointments();
+  const me = getMockUser();
+
+  if (!me) {
+    setItems([]);
     setLoading(false);
+    return;
   }
 
+  const mine = list.filter((b) => b.userId === me.id);
+  setItems(mine);
+  setLoading(false);
+}
   useEffect(() => {
     refresh();
   }, []);

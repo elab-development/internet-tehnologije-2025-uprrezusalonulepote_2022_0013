@@ -1,5 +1,6 @@
 import { BookingDto, BookingStatus } from "@/shared/types";
 import { mockBookings } from "@/mock/data";
+import { getMockUser } from "@/lib/session.client";
 
 // kasnije: USE_MOCK = false
 const USE_MOCK = true;
@@ -64,11 +65,19 @@ export async function createAppointment(
   data: Omit<BookingDto, "id">
 ): Promise<BookingDto> {
   if (USE_MOCK) {
+    const me = getMockUser();
+    if (!me) throw new Error("Nisi ulogovan");
+
+    const safeData = {
+      ...data,
+      userId: (data as any).userId ?? me.id,
+    };
+
     const items = readFromStorage();
 
     const created: BookingDto = {
       id: Date.now().toString(),
-      ...data,
+      ...safeData,
     };
 
     const next = [created, ...items];
