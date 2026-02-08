@@ -1,7 +1,7 @@
 import { UserDto } from "@/shared/types";
 import { mockUsers } from "@/mock/data";
 
-const USE_MOCK = true;
+const USE_MOCK = false;
 
 export async function getAllUsers(): Promise<UserDto[]> {
   if (USE_MOCK) return mockUsers;

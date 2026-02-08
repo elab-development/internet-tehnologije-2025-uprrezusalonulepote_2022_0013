@@ -4,6 +4,7 @@ import { AUTH_COOKIE, cookieOpts, signAuthToken } from "@/app/lib/auth";
 import bcrypt from "bcrypt";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
+console.log("REGISTER HIT");
 
 type Body =
   | {
@@ -31,6 +32,7 @@ export async function registerController(req: Request) {
 
   try {
     body = (await req.json()) as Body;
+    console.log("REGISTER BODY", body);
   } catch {
     return NextResponse.json(
       { error: "Neispravan JSON u body-ju" },
