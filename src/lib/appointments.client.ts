@@ -59,3 +59,23 @@ export async function updateAppointmentStatus(
 
   throw new Error("Backend nije implementiran");
 }
+
+export async function createAppointment(
+  data: Omit<BookingDto, "id">
+): Promise<BookingDto> {
+  if (USE_MOCK) {
+    const items = readFromStorage();
+
+    const created: BookingDto = {
+      id: Date.now().toString(),
+      ...data,
+    };
+
+    const next = [created, ...items];
+    writeToStorage(next);
+
+    return Promise.resolve(created);
+  }
+
+  throw new Error("Backend nije implementiran");
+}
