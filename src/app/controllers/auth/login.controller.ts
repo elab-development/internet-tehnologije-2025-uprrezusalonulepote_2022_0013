@@ -38,7 +38,7 @@ export async function loginController(req: Request) {
       sub: String(u.idKlijenta),
       email: u.email,
       name: `${u.ime} ${u.prezime}`,
-      role: u.role,
+      role: u.role as "KLIJENT" | "ADMIN" | "ZAPOSLENI",
       kind: "KLIJENT",
     });
 
@@ -70,7 +70,7 @@ export async function loginController(req: Request) {
     sub: String(u.idZaposleni),
     email: u.email,
     name: `${u.ime} ${u.prezime}`,
-    role: u.role,
+    role: u.role as "KLIJENT" | "ADMIN" | "ZAPOSLENI",
     kind: "ZAPOSLENI",
   });
 
