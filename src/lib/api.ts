@@ -1,11 +1,12 @@
 // src/lib/api.ts
-type ApiError = { error: string };
+type ApiError = { error?: string; message?: string };
 
-export async function apiFetch<T>(
-  url: string,
-  init?: RequestInit
-): Promise<T> {
-  const res = await fetch(url, {
+const API_BASE = "http://localhost:3001"; // backend
+
+export async function apiFetch<T>(url: string, init?: RequestInit): Promise<T> {
+  const fullUrl = url.startsWith("http") ? url : `${API_BASE}${url}`;
+
+  const res = await fetch(fullUrl, {
     ...init,
     headers: { "Content-Type": "application/json", ...(init?.headers || {}) },
     credentials: "include",
@@ -15,7 +16,7 @@ export async function apiFetch<T>(
     let msg = "Greška";
     try {
       const data = (await res.json()) as ApiError;
-      msg = data?.error ?? msg;
+      msg = data?.error || data?.message || `HTTP ${res.status} ${res.statusText}`;
     } catch {}
     throw new Error(msg);
   }
