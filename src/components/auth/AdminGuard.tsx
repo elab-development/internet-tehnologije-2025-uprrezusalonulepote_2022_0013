@@ -1,22 +1,20 @@
 "use client";
 
-import { ReactNode, useEffect } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { getMockUser } from "@/lib/session.client";
+import { authMe } from "@/lib/auth.client";
 
-type Props = {
-  children: ReactNode;
-};
-
-export default function AdminGuard({ children }: Props) {
+export default function AdminGuard() {
   const router = useRouter();
 
   useEffect(() => {
-    const user = getMockUser();
-    if (!user || user.role !== "ADMIN") {
-      router.replace("/appointments");
-    }
+    (async () => {
+      const user = await authMe();
+      const isAdmin = user?.role === "ADMIN";
+
+      if (!isAdmin) router.replace("/appointments");
+    })();
   }, [router]);
 
-  return <>{children}</>;
+  return null;
 }
