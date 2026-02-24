@@ -7,6 +7,9 @@ RUN npm install
 
 COPY . .
 
+ARG JWT_SECRET
+ENV JWT_SECRET=$JWT_SECRET
+
 RUN npm run build
 
 EXPOSE 3001
