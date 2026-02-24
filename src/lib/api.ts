@@ -1,6 +1,7 @@
 type ApiError = { error?: string; message?: string };
 
-const API_BASE = "http://localhost:3001"; // backend
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001"; // backend
 
 export async function apiFetch<T>(url: string, init?: RequestInit): Promise<T> {
   const fullUrl = url.startsWith("http") ? url : `${API_BASE}${url}`;
