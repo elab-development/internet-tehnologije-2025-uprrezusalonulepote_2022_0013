@@ -1,0 +1,38 @@
+services:
+  db:
+    image: postgres:16
+    container_name: beauty_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: beauty-salon
+    ports:
+      - "5433:5432"
+    volumes:
+      - beauty_db_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    container_name: beauty_backend
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/beauty-salon
+      JWT_SECRET: your_jwt_secret_here
+      JWT_EXPIRES: 7d
+      PORT: 3001
+    ports:
+      - "3001:3001"
+    depends_on:
+      - db
+
+  frontend:
+    build: .
+    container_name: beauty_frontend
+    environment:
+      API_URL: http://backend:3001
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  beauty_db_data:
