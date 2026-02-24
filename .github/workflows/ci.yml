@@ -112,6 +112,10 @@ jobs:
     name: Docker - build images
     runs-on: ubuntu-latest
     needs: [frontend, backend]
+
+    env:
+      JWT_SECRET: ci_dummy_secret_change_later
+
     steps:
       - uses: actions/checkout@v4
 
@@ -125,6 +129,8 @@ jobs:
           file: ./backend/Dockerfile
           push: false
           tags: beauty-salon-backend:ci
+          build-args: |
+            JWT_SECRET=${{ env.JWT_SECRET }}
 
       - name: Build frontend image
         uses: docker/build-push-action@v6
