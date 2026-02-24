@@ -33,17 +33,6 @@ jobs:
         run: npm run build
 
   backend:
-        - name: Debug paths (backend)
-        run: |
-          echo "PWD=$(pwd)"
-          ls -la
-          echo "---- package.json (top) ----"
-          sed -n '1,120p' package.json
-          echo "---- package-lock.json exists? ----"
-          ls -la package-lock.json || true
-          echo "---- workspace root? (../package.json) ----"
-          ls -la ../package.json || true
-          sed -n '1,80p' ../package.json || true
     name: Backend - install, test & build
     runs-on: ubuntu-latest
 
@@ -72,6 +61,18 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Debug paths (backend)
+        run: |
+          echo "PWD=$(pwd)"
+          ls -la
+          echo "---- package.json (top) ----"
+          sed -n '1,120p' package.json
+          echo "---- package-lock.json exists? ----"
+          ls -la package-lock.json || true
+          echo "---- workspace root? (../package.json) ----"
+          ls -la ../package.json || true
+          sed -n '1,80p' ../package.json || true
 
       - name: Use Node
         uses: actions/setup-node@v4
