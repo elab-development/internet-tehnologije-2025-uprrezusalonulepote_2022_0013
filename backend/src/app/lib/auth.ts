@@ -1,16 +1,18 @@
 import * as jwt from "jsonwebtoken";
 
-export const AUTH_COOKIE = "auth"; //kreiramo cookie u kome cemo smestiti token
-const JWT_SECRET = process.env.JWT_SECRET!; // citamo secret iz env fajla
+export const AUTH_COOKIE = "auth"; // kreiramo cookie u kome cemo smestiti token
 
-//error handling
-if (!JWT_SECRET) {
-  throw new Error("Missing JWT_SECRET in env file");
+function getJwtSecret() {
+  const s = process.env.JWT_SECRET;
+  if (!s) {
+    throw new Error("Missing JWT_SECRET in env");
+  }
+  return s;
 }
 
-//definisemo kako ce izgledati token
+// definisemo kako ce izgledati token
 export type JwtUserClaims = {
-  sub: string; //subject - standardno za JWT, obicno neki id
+  sub: string; // subject - standardno za JWT, obicno neki id
   email: string;
   name?: string;
   role: "ADMIN" | "ZAPOSLENI" | "KLIJENT";
@@ -21,13 +23,16 @@ export type JwtUserClaims = {
 // vraca string koji cemo smestiti u AUTH_TOKEN
 // koristimo HS256 algoritam, bitno je da simetrican, koristimo isti secret da ga posle verifikujemo
 export function signAuthToken(claims: JwtUserClaims) {
-  return jwt.sign(claims, JWT_SECRET, { algorithm: "HS256", expiresIn: "7d" });
+  return jwt.sign(claims, getJwtSecret(), {
+    algorithm: "HS256",
+    expiresIn: "7d",
+  });
 }
 
 // verifikujemo token, verify() vraca string pa ga pakujemo u JwtUserClaims
 // i posle uspesne verifikacije, ne znamo da li je vratio sve podatke pa proveravamo da li ima obavezne claim-ove
 export function verifyAuthToken(token: string): JwtUserClaims {
-  const payload = jwt.verify(token, JWT_SECRET) as jwt.JwtPayload &
+  const payload = jwt.verify(token, getJwtSecret()) as jwt.JwtPayload &
     JwtUserClaims;
 
   if (
