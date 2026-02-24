@@ -27,7 +27,7 @@ jobs:
         run: npm ci
 
       - name: Test
-        run: npx jest "src/**/__tests__/**/*" --ci
+        run: npx jest --ci --testPathPattern=src/__tests__
 
       - name: Build
         run: npm run build
