@@ -14,15 +14,15 @@ import {
 console.log("DATABASE_URL:", process.env.DATABASE_URL);
 
 async function seed() {
-  console.log(" Seeding started...");
+  console.log("🌱 Seeding started...");
 
-  // 1️. Radna mesta
+  // 1️⃣ Radna mesta
   const [frizer, kozmeticar] = await db
     .insert(radnaMesta)
     .values([{ naziv: "Frizer" }, { naziv: "Kozmetičar" }])
     .returning();
 
-  // 2️. Usluge
+  // 2️⃣ Usluge
   const [sisanje, feniranje, manikir] = await db
     .insert(usluge)
     .values([
@@ -32,7 +32,7 @@ async function seed() {
     ])
     .returning();
 
-  // 3️. Zaposleni
+  // 3️⃣ Zaposleni
   const [ana, milan] = await db
     .insert(zaposleni)
     .values([
@@ -53,14 +53,14 @@ async function seed() {
     ])
     .returning();
 
-  // 4️. Zaposleni ↔ Usluge
+  // 4️⃣ Zaposleni ↔ Usluge
   await db.insert(zaposleniUsluge).values([
     { zaposleniId: ana.idZaposleni, uslugaId: sisanje.idUsluga },
     { zaposleniId: ana.idZaposleni, uslugaId: feniranje.idUsluga },
     { zaposleniId: milan.idZaposleni, uslugaId: manikir.idUsluga },
   ]);
 
-  // 5️. Klijenti
+  // 5️⃣ Klijenti
   const [sara] = await db
     .insert(klijenti)
     .values([
@@ -76,7 +76,7 @@ async function seed() {
     ])
     .returning();
 
-  // 6️. Rezervacija
+  // 6️⃣ Rezervacija
   const [rez] = await db
     .insert(rezervacije)
     .values([
@@ -90,13 +90,13 @@ async function seed() {
     ])
     .returning();
 
-  // 7️. Rezervacija ↔ Usluge (više usluga)
+  // 7️⃣ Rezervacija ↔ Usluge (više usluga)
   await db.insert(rezervacijaUsluge).values([
     { rezervacijaId: rez.idRezervacije, uslugaId: sisanje.idUsluga },
     { rezervacijaId: rez.idRezervacije, uslugaId: feniranje.idUsluga },
   ]);
 
-  // 8️. Radna smena
+  // 8️⃣ Radna smena
   await db.insert(radneSmene).values([
     {
       datum: "2026-03-01",
