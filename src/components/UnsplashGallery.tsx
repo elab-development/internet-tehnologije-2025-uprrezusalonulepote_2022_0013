@@ -15,9 +15,7 @@ export default function UnsplashGallery() {
   const [photos, setPhotos] = useState<Photo[]>([]);
 
   useEffect(() => {
-    fetch(
-  `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/unsplash?q=hair%20salon&perPage=6`,
-)
+  fetch("/api/unsplash?q=hair%20salon&perPage=6")
       .then((r) => r.json())
       .then((data) => setPhotos(data?.photos ?? []))
       .catch(() => setPhotos([]));
