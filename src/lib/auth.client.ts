@@ -4,40 +4,74 @@ import { endpoints } from "@/lib/endpoints";
 import { apiFetch } from "@/lib/api";
 import { clearMockUser, getMockUser, loginMock } from "@/lib/session.client";
 
+type RegisterPayload =
+  | {
+      kind: "KLIJENT";
+      ime: string;
+      prezime: string;
+      email: string;
+      password: string;
+      brTelefona: string;
+      korisnickoIme: string;
+      adresa?: string;
+    }
+  | {
+      kind: "ZAPOSLENI";
+      ime: string;
+      prezime: string;
+      email: string;
+      password: string;
+      radnoMestoId: number;
+      role?: "ADMIN" | "ZAPOSLENI";
+    };
+
+    //gadja login rutu
 export async function authLogin(email: string, password: string): Promise<UserDto> {
-  if (USE_MOCK) {
-    // password ignorišemo u mocku
-    return loginMock(email);
-  }
+  if (USE_MOCK) return loginMock(email);
+
   const res = await apiFetch<{ user: UserDto }>(endpoints.auth.login, {
     method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
   });
+
   return res.user;
 }
 
+//gadja me rutu
 export async function authMe(): Promise<UserDto | null> {
   if (USE_MOCK) return getMockUser();
-  const res = await apiFetch<{ user: UserDto }>(endpoints.auth.me);
-  return res.user;
+
+  try {
+    const res = await apiFetch<{ user: UserDto }>(endpoints.auth.me);
+    return res.user;
+  } catch {
+    return null;
+  }
 }
 
+//gadja logout rutu
 export async function authLogout(): Promise<void> {
   if (USE_MOCK) {
     clearMockUser();
     return;
   }
-  await apiFetch<{ ok: true }>(endpoints.auth.logout, { method: "POST" });
+
+  await apiFetch<{ ok: true }>(endpoints.auth.logout, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+  });
 }
 
-export async function authRegister(name: string, email: string, password: string): Promise<UserDto> {
-  if (USE_MOCK) {
-    // u mocku samo “uloguj” tog korisnika
-    return loginMock(email);
-  }
+//gadja register rutu
+export async function authRegister(payload: RegisterPayload): Promise<UserDto> {
+  if (USE_MOCK) return loginMock(payload.email);
+
   const res = await apiFetch<{ user: UserDto }>(endpoints.auth.register, {
     method: "POST",
-    body: JSON.stringify({ name, email, password }),
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
   });
+
   return res.user;
 }

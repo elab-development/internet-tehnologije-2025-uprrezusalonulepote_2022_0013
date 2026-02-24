@@ -2,15 +2,12 @@ import { UserDto } from "@/shared/types";
 
 const USER_KEY = "iteh_user_v1";
 
-/**
- * Mock login – kreira usera, snima ga u localStorage i vraća ga
- */
 export function loginMock(email: string, name?: string): UserDto {
   const user: UserDto = {
-    id: email, // stabilan id; može i crypto.randomUUID()
+    id: email, 
     name: name ?? email.split("@")[0],
     email,
-    role: "CLIENT", // promeni ako ti UserDto nema role ili koristi drugo polje
+    role: "CLIENT", 
   } as UserDto;
 
   if (typeof window !== "undefined") {
@@ -20,9 +17,8 @@ export function loginMock(email: string, name?: string): UserDto {
   return user;
 }
 
-/**
- * Dohvata trenutno ulogovanog mock usera
- */
+ //Dohvata trenutno ulogovanog mock usera
+ 
 export function getMockUser(): UserDto | null {
   if (typeof window === "undefined") return null;
 
@@ -36,17 +32,17 @@ export function getMockUser(): UserDto | null {
   }
 }
 
-/**
- * Logout – briše usera iz storage-a
- */
+
+ //Logout – briše usera iz storage-a
+ 
 export function clearMockUser() {
   if (typeof window === "undefined") return;
   window.localStorage.removeItem(USER_KEY);
 }
 
-/**
- * NOVO – koristi se za filtriranje rezervacija (A2)
- */
+
+// NOVO – koristi se za filtriranje rezervacija (A2)
+
 export function getCurrentUserFromStorage() {
   return getMockUser();
 }

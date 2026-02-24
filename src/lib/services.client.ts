@@ -1,7 +1,6 @@
 import { ServiceDto } from "@/shared/types";
 import { mockServices } from "@/mock/data";
 
-// kasnije: USE_MOCK = false
 const USE_MOCK = true;
 
 // localStorage key

@@ -2,8 +2,7 @@ import { BookingDto, BookingStatus } from "@/shared/types";
 import { mockBookings } from "@/mock/data";
 import { getMockUser } from "@/lib/session.client";
 
-// kasnije: USE_MOCK = false
-const USE_MOCK = true;
+const USE_MOCK = true; //true je jer nema jos uvek rute
 
 // localStorage key
 const LS_KEY = "iteh_bookings_v1";

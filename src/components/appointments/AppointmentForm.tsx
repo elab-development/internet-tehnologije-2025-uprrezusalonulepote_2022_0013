@@ -19,8 +19,8 @@ return /^([01]\d|2[0-3]):[0-5]\d$/.test(value);
 }
 
 export default function AppointmentForm({ onCreated }: Props) {
-const [services, setServices] = useState<ServiceDto[]>([]);
-const [employees, setEmployees] = useState<EmployeeDto[]>([]);
+const [services, setServices] = useState<ServiceDto[]>([]); //ucitava listu usluga(mock podaci)
+const [employees, setEmployees] = useState<EmployeeDto[]>([]);//ucitava zaposlene u formu
 
 const [serviceId, setServiceId] = useState("");
 const [employeeId, setEmployeeId] = useState("");
@@ -43,7 +43,7 @@ const selectedService = useMemo(
   [services, serviceId]
 );
 
-const filteredEmployees = useMemo(() => {
+const filteredEmployees = useMemo(() => { //filtrira zap u odnosu na odabir usluge
   if (!selectedService) return employees;
   return employees.filter((emp) => selectedService.employeeIds.includes(emp.id));
 }, [employees, selectedService]);
@@ -54,7 +54,7 @@ useEffect(() => {
 }, [serviceId]);
 
 async function onSubmit(e: React.FormEvent) {
-  e.preventDefault();
+  e.preventDefault(); //sprecava refresh stranice kad se posalje forma
   setErr(null);
 
   try {

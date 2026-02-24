@@ -1,6 +1,8 @@
 import Link from "next/link";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
+import ExchangeRate from "@/components/ExchangeRate";
+import UnsplashGallery from "@/components/UnsplashGallery";
 
 export default function HomePage() {
   return (
@@ -9,6 +11,9 @@ export default function HomePage() {
       <p className="opacity-80 mb-6">
         Dobrodošla! Izaberi šta želiš da uradiš.
       </p>
+
+      <ExchangeRate />
+      <UnsplashGallery />
 
       <div className="grid gap-4 sm:grid-cols-2">
         <Card className="p-4 flex flex-col gap-3">
