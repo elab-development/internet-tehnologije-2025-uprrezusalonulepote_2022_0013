@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: frontend
+        working-directory: .
     steps:
       - uses: actions/checkout@v4
 
@@ -21,7 +21,7 @@ jobs:
         with:
           node-version: 20
           cache: npm
-          cache-dependency-path: frontend/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - name: Install
         run: npm ci
@@ -74,6 +74,20 @@ jobs:
 
       - name: Migrate DB (Drizzle)
         run: npm run db:migrate
+
+      - name: Start backend
+        run: |
+          npm run dev &
+          echo $! > backend.pid
+
+      - name: Wait for backend
+        run: |
+          for i in {1..30}; do
+            curl -sSf http://localhost:3001/api/health && exit 0
+            sleep 2
+          done
+          echo "Backend did not start in time" >&2
+          exit 1
 
       - name: Test
         run: npm test -- --ci
