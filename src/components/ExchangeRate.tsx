@@ -6,7 +6,7 @@ export default function ExchangeRate() {
   const [rate, setRate] = useState<number | null>(null);
 
   useEffect(() => {
-    fetch("http://localhost:3001/api/exchange")
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/exchange`)
       .then((r) => r.json())
       .then((data) => setRate(data?.rate ?? null))
       .catch(() => setRate(null));
