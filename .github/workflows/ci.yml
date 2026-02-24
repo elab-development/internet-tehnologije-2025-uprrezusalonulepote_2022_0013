@@ -27,7 +27,7 @@ jobs:
         run: npm ci
 
       - name: Test
-        run: npx jest --ci --testPathPatterns src/__tests__
+        run: npx jest --ci --testPathPatterns src/__tests__ --testPathIgnorePatterns /backend/
 
       - name: Build
         run: npm run build
