@@ -8,44 +8,44 @@ import Button from "@/components/ui/Button";
 import { ServiceDto } from "@/shared/types";
 
 type Props = {
-  initial?: ServiceDto | null; // ako postoji => edit
+  initial?: ServiceDto | null;
   onSaved?: (service: ServiceDto) => void;
 };
 
 export default function ServiceForm({ initial, onSaved }: Props) {
   const isEdit = Boolean(initial?.id);
 
-  const [name, setName] = useState("Šišanje");
-  const [durationMin, setDurationMin] = useState(45);
-  const [priceRsd, setPriceRsd] = useState(2500);
-  const [employeeIdsText, setEmployeeIdsText] = useState("e1"); // csv: e1,e2
+  console.log("INITIAL:", initial);
+
+  const [name, setName] = useState("");
+  const [durationMin, setDurationMin] = useState("");
+  const [priceRsd, setPriceRsd] = useState("");
   const [err, setErr] = useState<string | null>(null);
 
   useEffect(() => {
     if (!initial) return;
 
     setName(initial.name ?? "");
-    setDurationMin(initial.durationMin ?? 30);
-    setPriceRsd(initial.priceRsd ?? 0);
-    setEmployeeIdsText((initial.employeeIds ?? []).join(","));
+    setDurationMin(
+      initial.durationMin !== undefined ? String(initial.durationMin) : "",
+    );
+    setPriceRsd(initial.priceRsd !== undefined ? String(initial.priceRsd) : "");
   }, [initial]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setErr(null);
 
-    try {
-      const employeeIds = employeeIdsText
-        .split(",")
-        .map((x) => x.trim())
-        .filter(Boolean);
+    if (!name.trim() || !durationMin || !priceRsd) {
+      setErr("Sva polja su obavezna.");
+      return;
+    }
 
+    try {
       const payload = {
-        name,
+        name: name.trim(),
         durationMin: Number(durationMin),
         priceRsd: Number(priceRsd),
-        employeeIds,
-        createdAt: initial?.createdAt ?? new Date().toISOString(),
       };
 
       const saved = isEdit
@@ -54,12 +54,10 @@ export default function ServiceForm({ initial, onSaved }: Props) {
 
       onSaved?.(saved);
 
-      // reset samo kad dodaješ novu
       if (!isEdit) {
         setName("");
-        setDurationMin(30);
-        setPriceRsd(0);
-        setEmployeeIdsText("");
+        setDurationMin("");
+        setPriceRsd("");
       }
     } catch (e) {
       if (e instanceof Error) setErr(e.message);
@@ -73,37 +71,50 @@ export default function ServiceForm({ initial, onSaved }: Props) {
         {isEdit ? "Izmeni uslugu" : "Dodaj uslugu"}
       </h2>
 
-      {err && <div className="border p-2 rounded mb-3 text-sm">{err}</div>}
+      {err && (
+        <div className="border p-2 rounded mb-3 text-sm text-red-600">
+          {err}
+        </div>
+      )}
 
-      <form onSubmit={onSubmit} className="grid gap-3">
-        <Input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Naziv usluge"
-        />
-
-        <div className="grid grid-cols-2 gap-3">
+      <form onSubmit={onSubmit} className="grid gap-4">
+        <div>
+          <label className="block text-sm mb-1">Naziv usluge</label>
           <Input
-            type="number"
-            value={durationMin}
-            onChange={(e) => setDurationMin(Number(e.target.value))}
-            placeholder="Trajanje (min)"
-          />
-          <Input
-            type="number"
-            value={priceRsd}
-            onChange={(e) => setPriceRsd(Number(e.target.value))}
-            placeholder="Cena (RSD)"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Unesite naziv usluge"
+            required
           />
         </div>
 
-        <Input
-          value={employeeIdsText}
-          onChange={(e) => setEmployeeIdsText(e.target.value)}
-          placeholder="ID-jevi zaposlenih (npr: e1,e2)"
-        />
+        <div>
+          <label className="block text-sm mb-1">
+            Trajanje usluge (u minutima)
+          </label>
+          <Input
+            type="number"
+            value={durationMin}
+            onChange={(e) => setDurationMin(e.target.value)}
+            placeholder="Unesite trajanje u minutima (npr. 45)"
+            required
+          />
+        </div>
 
-        <Button type="submit">{isEdit ? "Sačuvaj izmene" : "Sačuvaj uslugu"}</Button>
+        <div>
+          <label className="block text-sm mb-1">Cena usluge (u dinarima)</label>
+          <Input
+            type="number"
+            value={priceRsd}
+            onChange={(e) => setPriceRsd(e.target.value)}
+            placeholder="Unesite cenu u RSD (npr. 2500)"
+            required
+          />
+        </div>
+
+        <Button type="submit">
+          {isEdit ? "Sačuvaj izmene" : "Sačuvaj uslugu"}
+        </Button>
       </form>
     </Card>
   );

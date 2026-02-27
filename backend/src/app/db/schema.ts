@@ -72,6 +72,8 @@ export const klijenti = pgTable(
 export const usluge = pgTable("usluge", {
   idUsluga: serial("id_usluga").primaryKey(),
   naziv: varchar("naziv", { length: 120 }).notNull(),
+  cena: integer("cena").notNull().default(0),
+  trajanje: integer("trajanje").notNull().default(0),
 });
 
 // 5) Many-to-many: Zaposleni <-> Usluga

@@ -1,129 +1,115 @@
 import { EmployeeDto, ServiceDto, ShiftDto } from "@/shared/types";
-import { mockEmployees, mockServices, mockShifts } from "@/mock/data";
+import { apiFetch } from "./api";
 
-const SHIFTS_LS_KEY = "mock_shifts";
+/**
+ * Mapira radno mesto ID u jobTitle
+ */
+function mapRadnoMestoIdToJobTitle(id: number): EmployeeDto["jobTitle"] {
+  switch (id) {
+    case 1:
+      return "FRIZER";
+    case 2:
+      return "KOZMETICAR";
+    case 3:
+      return "SMINKER";
+    default:
+      return "Nema usluge";
+  }
+}
 
-function loadShiftsFromLS(): ShiftDto[] {
-  if (typeof window === "undefined") return [];
+/**
+ * Dohvata sve zaposlene
+ */
+export async function getAllEmployeesFromApi(): Promise<EmployeeDto[]> {
   try {
-    const raw = localStorage.getItem(SHIFTS_LS_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
+    const data = await apiFetch<any[]>("/api/zaposleni");
+
+    return data.map((e) => ({
+      id: e.id.toString(),
+      name: `${e.ime} ${e.prezime}`,
+      email: e.email,
+      jobTitle: mapRadnoMestoIdToJobTitle(e.radnoMestoId),
+      role: e.role,
+    }));
+  } catch (err) {
+    console.error("Greška pri dohvatanju zaposlenih:", err);
     return [];
   }
 }
 
-function saveShiftsToLS(shifts: ShiftDto[]) {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(SHIFTS_LS_KEY, JSON.stringify(shifts));
-}
-
-
-const EMPLOYEES_LS_KEY = "mock_employees";
-
-function loadEmployeesFromLS(): EmployeeDto[] {
-  if (typeof window === "undefined") return [];
+/**
+ * Dohvata usluge po zaposlenom
+ */
+export async function getEmployeeServicesMapFromApi(): Promise<
+  Record<string, ServiceDto[]>
+> {
   try {
-    const raw = localStorage.getItem(EMPLOYEES_LS_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
-}
+    const data = await apiFetch<any[]>("/api/zaposleni");
+    const map: Record<string, ServiceDto[]> = {};
 
-function saveEmployeesToLS(employees: EmployeeDto[]) {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(EMPLOYEES_LS_KEY, JSON.stringify(employees));
-}
-
-
-let employeesStore: EmployeeDto[] =
-  typeof window !== "undefined" && loadEmployeesFromLS().length
-    ? loadEmployeesFromLS()
-    : [...mockEmployees];
-
-
-let shiftsStore: ShiftDto[] =
-  typeof window !== "undefined" && loadShiftsFromLS().length
-    ? loadShiftsFromLS()
-    : [...mockShifts];
-
-export async function getAllEmployees(): Promise<EmployeeDto[]> {
-  return employeesStore;
-}
-
-export async function updateEmployeeMock(
-  id: string,
-  patch: Partial<Pick<EmployeeDto, "name" | "email" | "phone" | "jobTitle">>
-): Promise<EmployeeDto | null> {
-  const idx = employeesStore.findIndex((e) => e.id === id);
-  if (idx === -1) return null;
-
-  employeesStore[idx] = {
-    ...employeesStore[idx],
-    ...patch,
-  };
-
-  saveEmployeesToLS(employeesStore);
-  return employeesStore[idx];
-}
-
-export async function getEmployeeServicesMap(): Promise<Record<string, ServiceDto[]>> {
-  const map: Record<string, ServiceDto[]> = {};
-
-  for (const s of mockServices) {
-    for (const eid of s.employeeIds) {
-      if (!map[eid]) map[eid] = [];
-      map[eid].push(s);
+    for (const e of data) {
+      map[e.id.toString()] =
+        e.usluge?.map((u: any) => ({
+          id: u.id,
+          name: u.naziv,
+          priceRsd: u.cena ?? 0,
+          durationMin: u.trajanje ?? 0,
+          employees: [],
+        })) ?? [];
     }
-  }
 
-  return map;
+    return map;
+  } catch (err) {
+    console.error("Greška pri dohvatanju usluga zaposlenih:", err);
+    return {};
+  }
 }
 
-export async function getEmployeeShiftsMap(): Promise<Record<string, ShiftDto[]>> {
-  const map: Record<string, ShiftDto[]> = {};
-
-  for (const sh of shiftsStore) {
-    if (!map[sh.employeeId]) map[sh.employeeId] = [];
-    map[sh.employeeId].push(sh);
+/**
+ * Dohvata smene po zaposlenom
+ */
+export async function getEmployeeShiftsMap(): Promise<
+  Record<string, ShiftDto[]>
+> {
+  try {
+    const map = await apiFetch<Record<string, ShiftDto[]>>("/api/radne-smene");
+    return map;
+  } catch (err) {
+    console.error("Greška pri dohvatanju smena zaposlenih:", err);
+    return {};
   }
+}
 
-  // opcionalno: sortiraj po datumu + startTime (za lepši prikaz)
-  for (const key of Object.keys(map)) {
-    map[key].sort((a, b) => {
-      const aa = `${a.date} ${a.startTime}`;
-      const bb = `${b.date} ${b.startTime}`;
-      return aa.localeCompare(bb);
+/**
+ * Update zaposlenog
+ */
+export async function updateEmployeeApi(
+  id: string,
+  patch: Partial<Pick<EmployeeDto, "name" | "email" | "jobTitle" | "role">>,
+): Promise<EmployeeDto> {
+  try {
+    const updated = await apiFetch<EmployeeDto>(`/api/zaposleni/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(patch),
     });
+    return updated;
+  } catch (err) {
+    console.error("Greška pri izmeni zaposlenog:", err);
+    throw err;
   }
-
-  return map;
 }
 
-export async function updateShiftMock(
-  shiftId: string,
-  patch: Partial<Pick<ShiftDto, "date" | "startTime" | "endTime" | "breakStart" | "breakEnd">>
-): Promise<ShiftDto | null> {
-  const idx = shiftsStore.findIndex((s) => s.id === shiftId);
-  if (idx === -1) return null;
+export async function addServiceToEmployee(
+  zaposleniId: string,
+  uslugaId: number,
+): Promise<{ ok: boolean; message?: string }> {
+  const res = await apiFetch<{ ok: boolean; message?: string }>(
+    "/api/zaposleni-usluge",
+    {
+      method: "POST",
+      body: JSON.stringify({ zaposleniId, uslugaId }),
+    },
+  );
 
-  shiftsStore[idx] = { ...shiftsStore[idx], ...patch };
-  saveShiftsToLS(shiftsStore);
-
-  return shiftsStore[idx];
-}
-
-export async function createShiftMock(
-  shift: Omit<ShiftDto, "id">
-): Promise<ShiftDto> {
-  const newShift: ShiftDto = {
-    id: `sh_${Date.now()}`,
-    ...shift,
-  };
-
-  shiftsStore.push(newShift);
-  saveShiftsToLS(shiftsStore);
-
-  return newShift;
+  return res; // može biti { ok: true, data } ili { ok: false, message }
 }

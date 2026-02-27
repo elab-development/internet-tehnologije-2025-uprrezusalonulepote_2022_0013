@@ -4,14 +4,18 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { authMe } from "@/lib/auth.client";
-import { getAllEmployees, updateEmployeeMock } from "@/lib/employees.client";
-import { EmployeeDto, UserDto } from "@/shared/types";
+import {
+  addServiceToEmployee,
+  getAllEmployeesFromApi,
+  updateEmployeeApi,
+} from "@/lib/employees.client";
+import { EmployeeDto, ServiceDto, UserDto } from "@/shared/types";
+import { getServices } from "@/lib/services.client";
 
 type FormState = {
   name: string;
   email: string;
-  phone: string;
-  jobTitle: EmployeeDto["jobTitle"] | "";
+  jobTitle: EmployeeDto["jobTitle"];
 };
 
 export default function AdminEmployeeEditPage() {
@@ -19,12 +23,16 @@ export default function AdminEmployeeEditPage() {
   const employeeId = useMemo(() => params?.id ?? "", [params]);
   const router = useRouter();
 
+  const [servicesOptions, setServicesOptions] = useState<ServiceDto[]>([]);
+  const [selectedServiceId, setSelectedServiceId] = useState<number | null>(
+    null,
+  );
+  const [serviceMessage, setServiceMessage] = useState<string | null>(null); // poruka za dodavanje usluge
   const [me, setMe] = useState<UserDto | null>(null);
   const [employee, setEmployee] = useState<EmployeeDto | null>(null);
   const [form, setForm] = useState<FormState>({
     name: "",
     email: "",
-    phone: "",
     jobTitle: "FRIZER",
   });
   const [loading, setLoading] = useState(true);
@@ -35,18 +43,20 @@ export default function AdminEmployeeEditPage() {
       setMe(current);
 
       if (current?.role === "ADMIN") {
-        const all = await getAllEmployees();
+        const all = await getAllEmployeesFromApi();
         const found = all.find((e) => e.id === employeeId) ?? null;
         setEmployee(found);
 
         if (found) {
           setForm({
-            name: found.name ?? "",
-            email: found.email ?? "",
-            phone: found.phone ?? "",
-            jobTitle: found.jobTitle ?? "FRIZER",
+            name: found.name,
+            email: found.email,
+            jobTitle: found.jobTitle,
           });
         }
+
+        const allServices = await getServices();
+        setServicesOptions(allServices);
       }
 
       setLoading(false);
@@ -61,126 +71,120 @@ export default function AdminEmployeeEditPage() {
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!employee) return;
 
-    // jobTitle mora biti union (ne sme "")
-    const jobTitleSafe: EmployeeDto["jobTitle"] =
-      form.jobTitle === "" ? "FRIZER" : form.jobTitle;
+    try {
+      await updateEmployeeApi(employeeId, {
+        name: form.name,
+        email: form.email,
+        jobTitle: form.jobTitle,
+        role: employee.role,
+      });
 
-    const updated = await updateEmployeeMock(employeeId, {
-      name: form.name,
-      email: form.email,
-      phone: form.phone || undefined,
-      jobTitle: jobTitleSafe,
-    });
-
-    if (!updated) {
-      alert("Greška: zaposleni nije pronađen.");
-      return;
+      alert("Sačuvano");
+      router.push(`/admin/employees/${employeeId}`);
+    } catch (err) {
+      console.error(err);
+      alert("Greška pri čuvanju zaposlenog.");
     }
-
-    alert("Sačuvano (mock)");
-    router.push(`/admin/employees/${employeeId}`);
   }
 
-  if (loading) {
-    return (
-      <div className="p-6 max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold mb-2">Izmena zaposlenog</h1>
-        <p>Učitavanje...</p>
-      </div>
-    );
-  }
-
-  if (!me || me.role !== "ADMIN") {
-    return (
-      <div className="p-6 max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold mb-2">Izmena zaposlenog</h1>
-        <p>Nemaš pristup.</p>
-      </div>
-    );
-  }
-
-  if (!employee) {
-    return (
-      <div className="p-6 max-w-4xl mx-auto">
-        <div className="flex items-center justify-between gap-4 mb-4">
-          <h1 className="text-2xl font-bold">Izmena zaposlenog</h1>
-          <Link href="/admin/employees" className="underline">
-            Nazad na listu
-          </Link>
-        </div>
-        <p>Zaposleni nije pronađen.</p>
-      </div>
-    );
-  }
+  if (loading) return <p>Učitavanje...</p>;
+  if (!me || me.role !== "ADMIN") return <p>Nemaš pristup</p>;
+  if (!employee) return <p>Zaposleni nije pronađen</p>;
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
-      <div className="flex items-center justify-between gap-4 mb-6">
-        <h1 className="text-2xl font-bold">Izmena zaposlenog</h1>
-        <Link href={`/admin/employees/${employeeId}`} className="underline">
-          Nazad na detalj
-        </Link>
-      </div>
+      <h1 className="text-2xl font-bold mb-4">Izmena zaposlenog</h1>
 
       <form onSubmit={onSubmit} className="border rounded p-4 space-y-4">
+        {/* Ime i email */}
         <div>
-          <label className="block text-sm opacity-80 mb-1">Ime i prezime</label>
+          <label>Ime i prezime</label>
           <input
-            className="w-full border rounded px-3 py-2 bg-transparent"
             value={form.name}
             onChange={(e) => onChange("name", e.target.value)}
-            placeholder="npr. Jovana Frizer"
             required
+            className="w-full border rounded px-3 py-2"
           />
         </div>
 
         <div>
-          <label className="block text-sm opacity-80 mb-1">Email</label>
+          <label>Email</label>
           <input
-            className="w-full border rounded px-3 py-2 bg-transparent"
+            type="email"
             value={form.email}
             onChange={(e) => onChange("email", e.target.value)}
-            placeholder="npr. jovana@salon.com"
-            type="email"
             required
+            className="w-full border rounded px-3 py-2"
           />
         </div>
 
+        {/* Dodavanje usluge */}
         <div>
-          <label className="block text-sm opacity-80 mb-1">Telefon</label>
-          <input
-            className="w-full border rounded px-3 py-2 bg-transparent"
-            value={form.phone}
-            onChange={(e) => onChange("phone", e.target.value)}
-            placeholder="npr. 060123123"
-          />
+          <label>Dodaj poziciju / uslugu</label>
+          <div className="flex gap-2 mt-1">
+            <select
+              value={selectedServiceId ?? ""}
+              onChange={(e) => setSelectedServiceId(Number(e.target.value))}
+              className="flex-1 border rounded px-3 py-2"
+            >
+              <option value="">Izaberi uslugu</option>
+              {servicesOptions.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
+            <button
+              type="button"
+              onClick={async () => {
+                if (!selectedServiceId || !employee) return;
+
+                try {
+                  const result = await addServiceToEmployee(
+                    employee.id,
+                    selectedServiceId,
+                  );
+
+                  if (!result.ok) {
+                    // Poruka ako usluga već postoji
+                    setServiceMessage(
+                      result.message || "Greška pri dodavanju usluge.",
+                    );
+                  } else {
+                    setServiceMessage(
+                      "Usluga je uspešno dodeljena zaposlenom!",
+                    );
+                    setSelectedServiceId(null); // reset dropdown
+                  }
+                } catch (err) {
+                  console.error(err);
+                  setServiceMessage("Greška pri dodavanju usluge.");
+                }
+              }}
+              className="border rounded px-4 py-2"
+            >
+              Dodaj
+            </button>
+          </div>
+
+          {/* Prikaz poruke korisniku */}
+          {serviceMessage && (
+            <div className="mt-2 p-2 bg-yellow-100 text-yellow-800 rounded">
+              {serviceMessage}
+            </div>
+          )}
         </div>
 
-        <div>
-          <label className="block text-sm opacity-80 mb-1">Pozicija</label>
-          <select
-            className="w-full border rounded px-3 py-2 bg-transparent"
-            value={form.jobTitle === "" ? "FRIZER" : form.jobTitle}
-            onChange={(e) =>
-              onChange("jobTitle", e.target.value as EmployeeDto["jobTitle"])
-            }
-            required
-          >
-            <option value="FRIZER">FRIZER</option>
-            <option value="SMINKER">SMINKER</option>
-            <option value="KOZMETICAR">KOZMETICAR</option>
-          </select>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <button className="border rounded px-4 py-2" type="submit">
-            Sačuvaj (mock)
+        {/* Dugme za čuvanje osnovnih podataka */}
+        <div className="flex gap-3 mt-4">
+          <button type="submit" className="border rounded px-4 py-2">
+            Sačuvaj
           </button>
-
           <Link
             href={`/admin/employees/${employeeId}`}
-            className="underline text-sm"
+            className="underline text-sm flex items-center px-2 py-2"
           >
             Otkaži
           </Link>

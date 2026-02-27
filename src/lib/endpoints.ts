@@ -7,7 +7,10 @@ export const endpoints = {
     logout: "/api/auth/logout",
   },
   services: {
-    list: "/api/services",
+    list: "/api/usluge",
+    create: "/api/usluge",
+    update: (id: string) => `/api/usluge/${id}`,
+    delete: (id: string) => `/api/usluge/${id}`,
   },
   employees: {
     list: "/api/employees",

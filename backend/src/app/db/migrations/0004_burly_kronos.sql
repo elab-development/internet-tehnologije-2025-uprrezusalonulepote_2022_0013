@@ -1,0 +1,1 @@
+ALTER TABLE "usluge" ALTER COLUMN "cena" SET DEFAULT 0;

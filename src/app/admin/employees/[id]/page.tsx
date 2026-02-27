@@ -5,8 +5,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { authMe } from "@/lib/auth.client";
 import {
-  getAllEmployees,
-  getEmployeeServicesMap,
+  getAllEmployeesFromApi,
+  getEmployeeServicesMapFromApi,
   getEmployeeShiftsMap,
 } from "@/lib/employees.client";
 import { EmployeeDto, ServiceDto, ShiftDto, UserDto } from "@/shared/types";
@@ -27,11 +27,11 @@ export default function AdminEmployeeDetailsPage() {
       setMe(current);
 
       if (current?.role === "ADMIN") {
-        const all = await getAllEmployees();
+        const all = await getAllEmployeesFromApi();
         const found = all.find((e) => e.id === employeeId) ?? null;
         setEmployee(found);
 
-        const servicesMap = await getEmployeeServicesMap();
+        const servicesMap = await getEmployeeServicesMapFromApi();
         setServices(servicesMap[employeeId] ?? []);
 
         const shiftsMap = await getEmployeeShiftsMap();
@@ -44,53 +44,27 @@ export default function AdminEmployeeDetailsPage() {
     run();
   }, [employeeId]);
 
-  if (loading) {
-    return (
-      <div className="p-6 max-w-5xl mx-auto">
-        <h1 className="text-2xl font-bold mb-2">Detalj zaposlenog</h1>
-        <p>Učitavanje...</p>
-      </div>
-    );
-  }
-
-  if (!me || me.role !== "ADMIN") {
-    return (
-      <div className="p-6 max-w-5xl mx-auto">
-        <h1 className="text-2xl font-bold mb-2">Detalj zaposlenog</h1>
-        <p>Nemaš pristup.</p>
-      </div>
-    );
-  }
-
-  if (!employee) {
-    return (
-      <div className="p-6 max-w-5xl mx-auto">
-        <h1 className="text-2xl font-bold mb-2">Detalj zaposlenog</h1>
-        <p>Zaposleni nije pronađen.</p>
-      </div>
-    );
-  }
+  if (loading) return <p>Učitavanje...</p>;
+  if (!me || me.role !== "ADMIN") return <p>Nemaš pristup</p>;
+  if (!employee) return <p>Zaposleni nije pronađen</p>;
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
-      {/* HEADER – OVDE JE IZMENI */}
-        <div className="flex items-center justify-between gap-4 mb-6">
-            <h1 className="text-2xl font-bold">Detalj zaposlenog</h1>
-
-            <div className="flex items-center gap-4">
-            <Link href={`/admin/employees/${employeeId}/edit`} className="underline">
-                Izmeni zaposlenog
-            </Link>
-
-            <Link href={`/admin/employees/${employeeId}/shifts`} className="underline">
-                Izmeni smene
-            </Link>
-
-            <Link href="/admin/employees" className="underline">
-                Nazad na listu
-            </Link>
+      {/* HEADER */}
+      <div className="flex items-center justify-between gap-4 mb-6">
+        <h1 className="text-2xl font-bold">Detalj zaposlenog</h1>
+        <div className="flex items-center gap-4">
+          <Link
+            href={`/admin/employees/${employeeId}/edit`}
+            className="underline"
+          >
+            Izmeni zaposlenog
+          </Link>
+          <Link href="/admin/employees" className="underline">
+            Nazad na listu
+          </Link>
         </div>
-    </div>
+      </div>
 
       {/* OSNOVNI PODACI */}
       <div className="border rounded p-4 mb-6">
@@ -98,9 +72,6 @@ export default function AdminEmployeeDetailsPage() {
           <div>
             <div className="text-xl font-semibold">{employee.name}</div>
             <div className="opacity-80 text-sm">{employee.email}</div>
-            {employee.phone && (
-              <div className="opacity-80 text-sm">{employee.phone}</div>
-            )}
           </div>
           <div className="text-sm opacity-70">{employee.jobTitle}</div>
         </div>
@@ -113,7 +84,7 @@ export default function AdminEmployeeDetailsPage() {
           <ul className="list-disc pl-5 space-y-1 opacity-90">
             {services.map((s) => (
               <li key={s.id}>
-                {s.name} ({s.durationMin} min, {s.priceRsd} RSD)
+                {s.name} ({s.durationMin ?? 0} min, {s.priceRsd ?? 0} RSD)
               </li>
             ))}
           </ul>

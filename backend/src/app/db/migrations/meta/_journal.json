@@ -22,6 +22,27 @@
       "when": 1770400339760,
       "tag": "0002_married_domino",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1771325569100,
+      "tag": "0003_quick_multiple_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1771325797727,
+      "tag": "0004_burly_kronos",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1771338377138,
+      "tag": "0005_aberrant_captain_flint",
+      "breakpoints": true
     }
   ]
 }

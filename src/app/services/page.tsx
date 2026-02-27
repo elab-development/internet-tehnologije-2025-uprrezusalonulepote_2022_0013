@@ -37,12 +37,14 @@ export default function ServicesPage() {
       ) : (
         <div className="grid gap-3">
           {services.map((s) => {
-            const employeeNames = (s.employeeIds ?? [])
-              .map((id) => employeeById.get(id) ?? id)
-              .join(", ");
+            // Direktno spajamo fullName zaposlenih
+            const employeeNames = s.employees.map((e) => e.fullName).join(", ");
 
             return (
-              <Card key={s.id} className="flex items-start justify-between gap-4">
+              <Card
+                key={s.id}
+                className="flex items-start justify-between gap-4"
+              >
                 <div>
                   <div className="font-semibold">{s.name}</div>
                   <div className="text-sm opacity-80">

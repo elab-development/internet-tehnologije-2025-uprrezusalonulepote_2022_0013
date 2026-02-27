@@ -44,9 +44,24 @@ export function clearMockUser() {
   window.localStorage.removeItem(USER_KEY);
 }
 
-/**
- * NOVO – koristi se za filtriranje rezervacija (A2)
- */
-export function getCurrentUserFromStorage() {
-  return getMockUser();
+export type CurrentUser = {
+  id: string;
+  ime: string;
+  email?: string;
+};
+
+const LS_KEY_USER = "iteh_current_user";
+
+export function getCurrentUserFromStorage(): CurrentUser | null {
+  if (typeof window === "undefined") return null;
+
+  const raw = window.localStorage.getItem(LS_KEY_USER);
+  if (!raw) return null;
+
+  try {
+    const user = JSON.parse(raw) as CurrentUser;
+    return user;
+  } catch {
+    return null;
+  }
 }

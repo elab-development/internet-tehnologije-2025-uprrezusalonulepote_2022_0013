@@ -8,13 +8,17 @@ export interface UserDto {
   createdAt: string; // ISO
 }
 
+export interface EmployeeShortDto {
+  id: number;
+  fullName: string; // spojeno ime + prezime
+}
+
 export interface ServiceDto {
-  id: string;
+  id: number;
   name: string;
-  durationMin: number;
   priceRsd: number;
-  employeeIds: string[]; // ko može da radi uslugu
-  createdAt: string;
+  durationMin: number;
+  employees: EmployeeShortDto[];
 }
 
 export interface EmployeeDto {
@@ -22,16 +26,15 @@ export interface EmployeeDto {
   name: string;
   email: string;
   jobTitle: "KOZMETICAR" | "SMINKER" | "FRIZER";
-  phone?: string;
-  createdAt: string;
+  role: "ZAPOSLENI" | "ADMIN";
 }
 
 export interface ShiftDto {
   id: string;
   employeeId: string;
-  date: string;      // YYYY-MM-DD
+  date: string; // YYYY-MM-DD
   startTime: string; // HH:mm
-  endTime: string;   // HH:mm
+  endTime: string; // HH:mm
   breakStart?: string;
   breakEnd?: string;
 }
@@ -39,12 +42,8 @@ export interface ShiftDto {
 export type BookingStatus = "ZAKAZAN" | "U_TOKU" | "ZAVRSEN" | "OTKAZAN";
 
 export type BookingDto = {
-  id: string;
-  userId: string; 
-  date: string;
-  startTime: string;
-  endTime: string;
-  status: BookingStatus;
-  serviceName: string;
-  employeeName: string;
+  datumVreme: Date;
+  napomena?: string;
+  zaposleniId: number;
+  uslugaId: number;
 };

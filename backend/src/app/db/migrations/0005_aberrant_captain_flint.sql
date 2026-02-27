@@ -1,0 +1,1 @@
+ALTER TABLE "usluge" ADD COLUMN "trajanje" integer DEFAULT 0 NOT NULL;

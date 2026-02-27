@@ -1,0 +1,1 @@
+ALTER TABLE "usluge" ADD COLUMN "cena" integer NOT NULL;

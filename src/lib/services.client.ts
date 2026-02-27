@@ -1,8 +1,9 @@
 import { ServiceDto } from "@/shared/types";
 import { mockServices } from "@/mock/data";
+//import { endpoints } from "@/lib/endpoints";
+import { apiFetch } from "./api";
 
-// kasnije: USE_MOCK = false
-const USE_MOCK = true;
+const USE_MOCK = false;
 
 // localStorage key
 const LS_KEY = "iteh_services_v1";
@@ -39,65 +40,64 @@ export async function getServices(): Promise<ServiceDto[]> {
   if (USE_MOCK) {
     return Promise.resolve(readFromStorage());
   }
-  // placeholder za backend
-  return [];
+
+  const data = await apiFetch<ServiceDto[]>("/api/usluge");
+
+  // API već vraća polja name, priceRsd, durationMin i employees
+  return data.map((d) => ({
+    id: d.id,
+    name: d.name,
+    durationMin: d.durationMin,
+    priceRsd: d.priceRsd,
+    employees: d.employees ?? [],
+  }));
 }
 
-export async function getServiceById(id: string): Promise<ServiceDto | null> {
+export async function getServiceById(id: number): Promise<ServiceDto | null> {
   if (USE_MOCK) {
     const items = readFromStorage();
     return Promise.resolve(items.find((s) => s.id === id) ?? null);
   }
-  throw new Error("Backend nije implementiran");
+  try {
+    return await apiFetch<ServiceDto>(`/api/usluge/${id}`);
+  } catch (err) {
+    // Ako usluga ne postoji, vratimo null
+    return null;
+  }
 }
 
+export type CreateServiceInput = {
+  name: string;
+  durationMin: number;
+  priceRsd: number;
+};
+
+export type UpdateServiceInput = CreateServiceInput;
+
 export async function createService(
-  data: Omit<ServiceDto, "id">
+  data: CreateServiceInput,
 ): Promise<ServiceDto> {
-  if (USE_MOCK) {
-    const items = readFromStorage();
-
-    const newService: ServiceDto = {
-      id: Date.now().toString(),
-      ...data,
-    };
-
-    const next = [newService, ...items];
-    writeToStorage(next);
-
-    return Promise.resolve(newService);
-  }
-
-  throw new Error("Backend nije implementiran");
+  return apiFetch<ServiceDto>("/api/usluge", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
 }
 
 export async function updateService(
-  id: string,
-  data: Partial<Omit<ServiceDto, "id">>
+  id: number,
+  data: UpdateServiceInput,
 ): Promise<ServiceDto> {
-  if (USE_MOCK) {
-    const items = readFromStorage();
-    const idx = items.findIndex((s) => s.id === id);
-    if (idx === -1) throw new Error("Usluga nije pronađena");
-
-    const updated: ServiceDto = { ...items[idx], ...data, id };
-    const next = [...items];
-    next[idx] = updated;
-
-    writeToStorage(next);
-    return Promise.resolve(updated);
-  }
-
-  throw new Error("Backend nije implementiran");
+  return apiFetch<ServiceDto>(`/api/usluge/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(data),
+  });
 }
 
-export async function deleteService(id: string): Promise<void> {
+export async function deleteService(id: number): Promise<void> {
   if (USE_MOCK) {
     const items = readFromStorage();
-    const next = items.filter((s) => s.id !== id);
-    writeToStorage(next);
+    writeToStorage(items.filter((s) => s.id !== id));
     return Promise.resolve();
   }
-
-  throw new Error("Backend nije implementiran");
+  await apiFetch<void>(`/api/usluge/${id}`, { method: "DELETE" });
 }

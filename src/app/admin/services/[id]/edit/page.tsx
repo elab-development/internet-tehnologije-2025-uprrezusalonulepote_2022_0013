@@ -11,19 +11,23 @@ import { ServiceDto } from "@/shared/types";
 export default function AdminServiceEditPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
-  const id = params?.id;
+  const idParam = params?.id;
+  const id = idParam ? Number(idParam) : undefined;
 
   const [service, setService] = useState<ServiceDto | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
+      if (!id) return;
+
       setLoading(true);
       const s = await getServiceById(id);
       setService(s);
       setLoading(false);
     }
-    if (id) load();
+
+    load();
   }, [id]);
 
   if (loading) return <div>Učitavanje...</div>;

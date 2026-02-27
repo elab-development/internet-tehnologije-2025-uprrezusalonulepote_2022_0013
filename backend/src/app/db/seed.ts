@@ -26,9 +26,9 @@ async function seed() {
   const [sisanje, feniranje, manikir] = await db
     .insert(usluge)
     .values([
-      { naziv: "Šišanje" },
-      { naziv: "Feniranje" },
-      { naziv: "Manikir" },
+      { naziv: "Šišanje", cena: 1200 },
+      { naziv: "Feniranje", cena: 800 },
+      { naziv: "Manikir", cena: 2500 },
     ])
     .returning();
 
