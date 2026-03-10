@@ -1,0 +1,2 @@
+ALTER TABLE "klijenti" ADD CONSTRAINT "zaposleni_lozinka_min_8" CHECK (length("klijenti"."lozinka") >= 8);--> statement-breakpoint
+ALTER TABLE "zaposleni" ADD CONSTRAINT "zaposleni_lozinka_min_8" CHECK (length("zaposleni"."lozinka") >= 8);
